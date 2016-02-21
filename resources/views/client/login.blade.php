@@ -65,12 +65,14 @@
 
 <script>
   $(function(){
-    $('form').submit(function(e){
-      console.log( $('input[name="email"]') );
-      if( ($('input[name="email"]').val() == '') || ($('input[name="password"]').val() == '') ){
+    $('input[type="submit"]').click(function(e){
+     
+      var transactionsID = $('input[name="transactionsID"]').val();
+      var verification_code = $('input[name="verification_code"]').val();
+      if( (transactionsID == '' || transactionsID == 'undefined') || (verification_code == '' || verification_code == 'undefined') ){
         alert('Please supply all information');
-
         e.preventDefault();
+        
       } else {
         $('form').submit();
       }
