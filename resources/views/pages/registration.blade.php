@@ -79,7 +79,7 @@ Patient Information System
             <li><a href="#">Home</a></li>
             <li><a href="#">About Us</a></li>
             <li><a href="#"><i class="glyphicon glyphicon-user"></i>{{ Auth::user()->firstname }}</a></li>
-            <li><a href="{{ URL::to('/auth/logout') }}">Logout</a></li>
+            <li><a href="{{ URL::to('/teller/logout') }}">Logout</a></li>
         </ul>
     </div>
     </div>

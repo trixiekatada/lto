@@ -48,9 +48,9 @@ Route::post('client/login', 'ClientController@post_login');
 //teller routes
 Route::get('teller/login', 'TellerController@index');
 Route::post('teller/login', 'TellerController@post_login');
-
+Route::post('teller/login', 'TellerController@getLogout');
 //queue routes11
-
+Route::post('queue/change', 'QueueController@change_teller');
 /*
 Route::get('/auth/login', ['as'=>'login', 'uses'=>'Auth\AuthController@getLogin']);
 Route::post('/auth/login', 'Auth\AuthController@postLogin');
