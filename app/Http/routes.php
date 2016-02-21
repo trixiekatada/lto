@@ -59,7 +59,7 @@ Route::post('/teller/login', 'TellerController@login');
 Route::post('/teller/register', 'TellerController@store');
 Route::get('/teller/register', 'TellerController@register');
 
-Route::get('/teller/logout', 'Auth\AuthController@getLogout');
+Route::get('/teller/logout', 'TellerController@get_logout');
 
 //queue routes11
 

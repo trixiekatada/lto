@@ -216,68 +216,72 @@ class TellerController extends Controller
         return view('pages.receiving');
     }
 
+//login get in routes
     public function index(){
+      //check if we have session if has, then redirect
+      if( Session::has('teller_counter_id') ){
+        $counter = Session::get('teller_counter_id');
+        $redirect = $this->__get_page( $counter );
+        return Redirect::intended( $redirect );
+      }
+
+
       return view('teller.login');
     }
-     public function register()
-    {
+
+     public function register(){
       $owners = Counter::all();
 
-        foreach ($owners as $data) {
-                $owner[$data->counter_name] = $data->counter_name;
-            }
+      foreach ($owners as $data) {
+          $owner[$data->counter_name] = $data->counter_name;
+      }
     
-        return view('teller.register')->with('owners', $owner);
+      return view('teller.register')->with('owners', $owner);
     }
 
+    public function get_logout(){
+      Session::flush();
+      return Redirect::intended('/');
+    }
+
+//login post
     public function login(Request $request)
-    {
+    {      
         $input = Input::all();
-        var_dump($input);
         $remember = (Input::has('remember')) ? true : false;
 
         $auth = Auth::attempt([
             'email' => $input['email'],
-            'password' => Hash::make($input['password'])
-            ]
+            'password' => $input['password']
+            ], $remember
         );
 
         if ($auth) 
         {
-            $user = Auth::user()->counter_id;
+            $counter_id = Auth::user()->counter_id;
             Session::put('teller_counter_id',Auth::user()->counter_id);
 
-            if ($user == 'registration') 
-            {
-                return Redirect::intended('/pages/registration');
-            }
-             elseif ($user == 'approving')
-            {
-                return Redirect::intended('/pages/approving');
-            }
-            elseif ($user == 'cashier') 
-            {
-                return Redirect::intended('/pages/cashier');
-            }
-            elseif ($user == 'photo signature') 
-            {
-                return Redirect::intended('/pages/photosignature');
-            }
-            elseif ($user == 'receiving') {
-                return Redirect::intended('/pages/receiving');
-            }
-            else{
-             echo "user";
-              var_dump($user);
-                          }
+            $redirect = $this->__get_page( $counter_id );
+            return Redirect::intended( $redirect );
         }
         else {
+          //@TODO flash error message on the page
           echo "auth";
           var_dump($auth);
         }
     }
-    /**
-     * Display a listing of the resource.
+    //return which page the teller is assigned to
+    private function __get_page( $counter ){
+      switch( $counter ){
+        case 'registration': $page = '/registration'; break;
+        case 'approving': $page = '/registration'; break;
+        case 'cashier': $page = '/registration'; break;
+        case 'photo signature': $page = '/photosignature'; break;
+        case 'receiving': $page = '/receiving'; break;       
+      }
+      return '/pages'.$page;
+    }
+    /**rce.
      *
      * @return Response
      */
