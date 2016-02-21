@@ -64,7 +64,7 @@ Route::get('/teller/logout', 'Auth\AuthController@getLogout');
 //queue routes11
 
 
->>>>>>> a69a505b62a82ee7f6da34fb7cb3fa1b61db82b3
+
 /*
 Route::get('/auth/login', ['as'=>'login', 'uses'=>'Auth\AuthController@getLogin']);
 Route::post('/auth/login', 'Auth\AuthController@postLogin');
