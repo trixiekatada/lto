@@ -78,13 +78,14 @@ Patient Information System
         <ul>
             <li><a href="#">Home</a></li>
             <li><a href="#">About Us</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-user"></i>{{ Auth::user()->firstname }}</a></li>
+            <li><a href="#"><i class="glyphicon glyphicon-user"></i>{{ $data_view['session']['firstname'] }}</a></li>
             <li><a href="{{ URL::to('/teller/logout') }}">Logout</a></li>
         </ul>
     </div>
     </div>
 </div>
 <div class="container">
+
     <br>
         <div class="premiumm">
             <div class="pre-topp">
@@ -93,11 +94,12 @@ Patient Information System
             </div>
         </div>
         <br><br><br>
+
          
 <br><br><br>
 <ul align="left">
 <div class="pending">
-    <h3>Pending Number :</h3>
+    <h3>Pending Number : {{ $data_view['queue_pending'] }}</h3>
     <input type="text">
 </div>
 <div class="total">
@@ -120,7 +122,7 @@ Patient Information System
 <br><br><br><br>
 <div align="center">
 <h1>
-    {{ $r->p_number }}
+    
 </h1></div><br><br><br><br>
 <span>For Evaluation</span>
 <span>Customer Name: </span>

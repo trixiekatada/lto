@@ -23,9 +23,22 @@ use App\DateTime;
 class TellerController extends Controller {
 
     protected $session = array();
+    protected $data_view = array();
 
     public function __construct(){
-      $this->session = Session::get('teller_info');
+      if( Session::has('teller_info') ){
+        $this->session = Session::get('teller_info');
+        $this->data_view['session'] = $this->session;
+
+        //all all how many on queue on that teller
+       $queue_pending = Job::where('counterID_fk', $this->session['counter_id'])->get();
+       $queue_pending = count($queue_pending);
+       $this->data_view['queue_pending'] = $queue_pending;
+
+      } else {
+        return Redirect::intended('/');
+      }
+      
     }
 
     public function getNextQueue(){
@@ -160,7 +173,7 @@ class TellerController extends Controller {
       $rpro = AvailableList::where('counter','cashier')->first();
       $rproc = AvailableList::where('counter','receiving')->first();
 
-        return view('pages.registration', ['session' => $this->session] );
+        return view('pages.registration', ['data_view' => $this->data_view] );
 
     }
 
@@ -240,7 +253,7 @@ class TellerController extends Controller {
       $owners = Counter::all();
 
       foreach ($owners as $data) {
-          $owner[$data->counter_name] = $data->counter_name;
+          $owner[$data->counter_id] = $data->counter_name;
       }
     
       return view('teller.register')->with('owners', $owner);
@@ -280,11 +293,11 @@ class TellerController extends Controller {
     //return which page the teller is assigned to
     private function __get_page( $counter ){
       switch( $counter ){
-        case 'registration': $page = '/registration'; break;
-        case 'approving': $page = '/registration'; break;
-        case 'cashier': $page = '/registration'; break;
-        case 'photo signature': $page = '/photosignature'; break;
-        case 'receiving': $page = '/receiving'; break;       
+        case 1: $page = '/registration'; break;
+        case 2: $page = '/approving'; break;
+        case 3: $page = '/cashier'; break;
+        case 4: $page = '/photosignature'; break;
+        case 5: $page = '/receiving'; break;       
       }
       return '/pages'.$page;
     }
