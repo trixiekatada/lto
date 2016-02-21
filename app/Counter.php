@@ -10,6 +10,6 @@ class Counter extends Model
     protected $primaryKey = 'counter_id';
 
     public function getCounter(){
-        return $this->hasOne("App\User", "id", "id" );
+        return $this->hasOne("App\User", "teller_id", "teller_id" );
     }
 }
