@@ -1,0 +1,84 @@
+
+@extends('layouts.login')
+
+
+@section('content')
+<title>Login</title>
+        <div class="containerz">
+            <div class="box">
+                <div class="box2"> 
+                   <div class="header">
+  <div class="container">
+      <div class="logo">
+        <h1><a href="index.html">LTO QUEUE MANAGEMENT SYSTEM</a></h1>
+      </div>
+    <div class="top-nav">
+      <ul class="right-icons">
+        <li><a href="{{ URL::to('/') }}"><i class="glyphicon glyphicon-user"></i>Home page</a></li>
+        
+      </ul>
+
+    <div class="clearfix"> </div>
+  
+         
+        <link href="css/popuo-box.css" rel="stylesheet" type="text/css" media="all"/>
+        <script src="js/jquery.magnific-popup.js" type="text/javascript"></script>
+
+        <div id="small-dialog" class="mfp-hide">
+          
+        </div>
+         <script>
+            $(document).ready(function() {
+            $('.popup-with-zoom-anim').magnificPopup({
+              type: 'inline',
+              fixedContentPos: false,
+              fixedBgPos: true,
+              overflowY: 'auto',
+              closeBtnInside: true,
+              preloader: false,
+              midClick: true,
+              removalDelay: 300,
+              mainClass: 'my-mfp-zoom-in'
+            });
+                                            
+            });
+        </script>
+          
+  
+    </div>
+    <div class="clearfix"> </div>
+    </div>  
+</div>
+<div class="login-right">
+  <div class="container">
+    <h3>Login</h3>
+    <div class="login-top">
+        <div class="form-info">
+          {!! Form::open() !!}
+           <form class="form-horizontal" role="form" method="POST" action="/client/login">
+ 		       <h4>Transaction ID</h4><br />
+            <input type="text" class="text" placeholder="Transaction ID" name="transactionsID" value="{{ old('transactionsID') }}" />
+            <h4>Verification Code</h4><br />
+            <input type="text"  placeholder="Verification Code" name="verification_code" />       
+        
+            <br><br>
+             <label class="hvr-sweep-to-right">
+              <input type="submit" value="Submit"></a>
+                   </label>
+          </form>
+          {!! Form::close() !!}
+        </div>
+     
+  </div>
+</div>
+</div> 
+  </div>
+                </div>   
+            </div>
+            
+        </div>
+
+
+
+
+@stop 

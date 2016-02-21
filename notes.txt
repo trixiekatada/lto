@@ -1,0 +1,16 @@
+Do we need to have two logins?
+teller and client
+
+Document your codes!
+
+
+client login auth
+transaction ID 
+verfication code 
+
+teller login auth
+username/email
+password
+
+
+insert into
