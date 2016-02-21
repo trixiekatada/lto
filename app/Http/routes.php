@@ -46,10 +46,16 @@ Route::get('client/login', 'ClientController@index');
 Route::post('client/login', 'ClientController@post_login');
 
 //teller routes
-Route::get('teller/login', 'TellerController@index');
-Route::post('teller/login', 'TellerController@post_login');
+Route::get('/teller/login', 'TellerController@index');
+Route::post('/teller/login', 'TellerController@login');
+
+Route::post('/teller/register', 'TellerController@store');
+Route::get('/teller/register', 'TellerController@register');
+
+Route::get('/teller/logout', 'Auth\AuthController@getLogout');
 
 //queue routes11
+
 
 /*
 Route::get('/auth/login', ['as'=>'login', 'uses'=>'Auth\AuthController@getLogin']);

@@ -21,14 +21,14 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var string
      */
-    protected $table = 'users';
+    protected $table = 'tbl_tellers';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['firstname','lastname', 'email', 'password','address','mobile','birthdate','gender','age'];
+    protected $fillable = ['firstname','lastname', 'email', 'password','address','mobile','birth','gender','age'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -36,7 +36,7 @@ class User extends Model implements AuthenticatableContract,
      * @var array
      */
     public function getCounter(){
-        return $this->hasOne("App\Counter", "counter_id", "counter_id" );
+        return $this->hasOne("App\Counter", "counter_id", "counter_name" );
     }
 
 }

@@ -68,7 +68,11 @@
           </form>
           {!! Form::close() !!}
         </div>
-     
+      <div class="create">
+        <h4>New Teller?</h4>
+        <a class="hvr-sweep-to-right" href="/teller/register">Create an Account</a>
+        <div class="clearfix"> </div>
+      </div>
   </div>
 </div>
 </div> 
