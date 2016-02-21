@@ -216,32 +216,35 @@ class TellerController extends Controller
         return view('pages.receiving');
     }
 
-
-     public function index()
+    public function index(){
+      return view('teller.login');
+    }
+     public function register()
     {
       $owners = Counter::all();
 
         foreach ($owners as $data) {
-                $owner[$data->counter] = $data->counter;
+                $owner[$data->counter_name] = $data->counter_name;
             }
     
-        return view('teller.login')->with('owners', $owner);
+        return view('teller.register')->with('owners', $owner);
     }
 
     public function login(Request $request)
     {
         $input = Input::all();
+        var_dump($input);
         $remember = (Input::has('remember')) ? true : false;
 
         $auth = Auth::attempt([
             'email' => $input['email'],
-            'password' => $input['password']
-            ],$remember
+            'password' => Hash::make($input['password'])
+            ]
         );
 
         if ($auth) 
         {
-            $user = Auth::user()->counter;
+            $user = Auth::user()->counter_id;
             Session::put('teller_counter_id',Auth::user()->counter_id);
 
             if ($user == 'registration') 
@@ -263,6 +266,14 @@ class TellerController extends Controller
             elseif ($user == 'receiving') {
                 return Redirect::intended('/pages/receiving');
             }
+            else{
+             echo "user";
+              var_dump($user);
+                          }
+        }
+        else {
+          echo "auth";
+          var_dump($auth);
         }
     }
     /**
@@ -316,7 +327,7 @@ class TellerController extends Controller
             'lastname'=> 'required|string',
             'firstname' => 'required|string',
             'gender'=> 'required|string',
-            'birthdate'=> 'required|string',
+            'birth'=> 'required|string',
             'address'=> 'required',
             'mobile'=> 'required|numeric',
             'email' => 'required|email',
@@ -330,7 +341,7 @@ class TellerController extends Controller
             'firstname.string'=> 'Letters only',
             'gender.required'=> 'Should not be empty',
             'gender.string'  => 'Letters only',
-            'birthdate.required'=> 'Should not be empty',
+            'birth.required'=> 'Should not be empty',
             'birthdate.date' => 'Date only',
             'address.required' => 'Should not be empty',
             'mobile.required' => 'Should not be empty',
@@ -349,14 +360,14 @@ class TellerController extends Controller
                 $teller->firstname= $data['firstname'];
                 $teller->lastname= $data['lastname'];
                 $teller->gender= $data['gender'];
-                $teller->birthdate= $data['birthdate'];
+                $teller->birth= $data['birth'];
                 $teller->address = $data['address'];
                 $teller->mobile  = $data['mobile'];
                 $teller->email = $data['email'];
-                $teller->counter = $r;
+                $teller->counter_id = $r;
                 $teller->password = $password;
                 $teller->save();
-                return Redirect::to('/auth/login');
+                return Redirect::to('/teller/login');
                } 
                else {
                     return Redirect::back()->withInput()->withErrors($validation);
