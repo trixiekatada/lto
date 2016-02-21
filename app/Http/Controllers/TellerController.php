@@ -20,8 +20,14 @@ use View;
 use DB;
 use App\DateTime;
 
-class TellerController extends Controller
-{
+class TellerController extends Controller {
+
+    protected $session = array();
+
+    public function __construct(){
+      $this->session = Session::get('teller_info');
+    }
+
     public function getNextQueue(){
         if(Session::get('queue_id')){
         echo 'next clicked';
@@ -147,13 +153,14 @@ class TellerController extends Controller
 
     public function validationProcess()
     {
+     
       $r = AvailableList::where('counter','validation')->first();
       $rp = AvailableList::where('counter','approving')->first();
       $rpr = AvailableList::where('counter','photo signature')->first();
       $rpro = AvailableList::where('counter','cashier')->first();
       $rproc = AvailableList::where('counter','receiving')->first();
 
-        return view('pages.registration', compact('r','rp','rpr','rpro','rproc'));
+        return view('pages.registration', ['session' => $this->session] );
 
     }
 
@@ -219,9 +226,9 @@ class TellerController extends Controller
 //login get in routes
     public function index(){
       //check if we have session if has, then redirect
-      if( Session::has('teller_counter_id') ){
-        $counter = Session::get('teller_counter_id');
-        $redirect = $this->__get_page( $counter );
+      if( Session::has('teller_info') ){
+        $counter = Session::get('teller_info');
+        $redirect = $this->__get_page( $counter->counter_id );
         return Redirect::intended( $redirect );
       }
 
@@ -259,7 +266,7 @@ class TellerController extends Controller
         if ($auth) 
         {
             $counter_id = Auth::user()->counter_id;
-            Session::put('teller_counter_id',Auth::user()->counter_id);
+            Session::put('teller_info',Auth::user());
 
             $redirect = $this->__get_page( $counter_id );
             return Redirect::intended( $redirect );
