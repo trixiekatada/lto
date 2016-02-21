@@ -352,7 +352,7 @@ h2.resp-accordion:hover{
 	background-color: #fff;
   	border-radius: 3px;
 }
-.login input[type="text"] {
+.login input[type="text"], .login input[type="email"] {
 	outline: none;
 	padding: 8px 15px;
   	background: none;
@@ -2887,7 +2887,7 @@ p.privacy-para {
 	  width: 60%;
 	  margin: 2% auto 0;
 }
-.form-info input[type="text"],.form-info input[type="password"]{
+.form-info input[type="text"], .form-info input[type="email"], .form-info input[type="password"]{
 	outline: none;
   	background: none;
   	color: #a3a3a3;

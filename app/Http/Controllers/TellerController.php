@@ -225,7 +225,7 @@ class TellerController extends Controller
                 $owner[$data->counter] = $data->counter;
             }
     
-        return view('auth.register')->with('owners', $owner);
+        return view('teller.login')->with('owners', $owner);
     }
 
     public function login(Request $request)

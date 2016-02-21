@@ -41,9 +41,15 @@ Route::get('/tellerindex', function () {
 });
 
 
-//client login
+//client routes
 Route::get('client/login', 'ClientController@index');
 Route::post('client/login', 'ClientController@post_login');
+
+//teller routes
+Route::get('teller/login', 'TellerController@index');
+Route::post('teller/login', 'TellerController@post_login');
+
+//queue routes11
 
 /*
 Route::get('/auth/login', ['as'=>'login', 'uses'=>'Auth\AuthController@getLogin']);

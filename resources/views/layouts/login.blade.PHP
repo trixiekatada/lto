@@ -20,11 +20,12 @@
         {!!HTML:: style('font-awesome/css/font-awesome.min.css')!!}
         {!!HTML:: style('font-awesome/css/font-awesome.css')!!}
 
+         {!!HTML:: script('js/jquery.min.js') !!}
         {!!HTML:: script('js/easyResponsiveTabs.js') !!}
         {!!HTML:: script('js/jquery.flexslider.js') !!}
         {!!HTML:: script('js/jquery.flexisel.js') !!}
         {!!HTML:: script('js/jquery.magnific-popup.js') !!}
-        {!!HTML:: script('js/jquery.min.js') !!}
+       
         {!!HTML:: script('js/responsiveslides.min.js') !!}
         {!!HTML:: script('js/script.js') !!}
 

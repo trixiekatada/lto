@@ -3,7 +3,7 @@
 
 
 @section('content')
-<title>Login</title>
+<title>Teller Login</title>
         <div class="containerz">
             <div class="box">
                 <div class="box2"> 
@@ -27,7 +27,23 @@
         <div id="small-dialog" class="mfp-hide">
           
         </div>
-       
+         <script>
+            $(document).ready(function() {
+            $('.popup-with-zoom-anim').magnificPopup({
+              type: 'inline',
+              fixedContentPos: false,
+              fixedBgPos: true,
+              overflowY: 'auto',
+              closeBtnInside: true,
+              preloader: false,
+              midClick: true,
+              removalDelay: 300,
+              mainClass: 'my-mfp-zoom-in'
+            });
+                                            
+            });
+        </script>
+          
   
     </div>
     <div class="clearfix"> </div>
@@ -35,15 +51,15 @@
 </div>
 <div class="login-right">
   <div class="container">
-    <h3>Login</h3>
+    <h3>Teller Login</h3>
     <div class="login-top">
         <div class="form-info">
           {!! Form::open() !!}
-           <form class="form-horizontal" role="form" method="POST" action="/client/login">
- 		       <h4>Transaction ID</h4><br />
-            <input type="text" class="text" placeholder="Transaction ID" name="transactionsID" value="{{ old('transactionsID') }}" />
-            <h4>Verification Code</h4><br />
-            <input type="text"  placeholder="Verification Code" name="verification_code" />       
+           <form class="form-horizontal" role="form" method="POST" action="/teller/login">
+ 		       <h4>Email Address</h4><br />
+            <input type="email" class="text" placeholder="Email Address" name="email" value="{{ old('email') }}" />
+            <h4>Password</h4><br />
+            <input type="password"  placeholder="Password" name="password" />       
         
             <br><br>
              <label class="hvr-sweep-to-right">
@@ -62,17 +78,14 @@
             
         </div>
 
-
 <script>
-  $(function(){
-    $('form').submit(function(e){
-      console.log( $('input[name="email"]') );
-      if( ($('input[name="email"]').val() == '') || ($('input[name="password"]').val() == '') ){
+  $(function{
+    $(form).submit(function(e){
+      if( $('input[name="email"])').val() == '' OR $('input[name="password"]').val() ){
         alert('Please supply all information');
-
         e.preventDefault();
       } else {
-        $('form').submit();
+        $(form).submit();
       }
     });
 
