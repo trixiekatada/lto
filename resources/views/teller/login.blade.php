@@ -18,31 +18,8 @@
         
       </ul>
 
-    <div class="clearfix"> </div>
   
-         
-        <link href="css/popuo-box.css" rel="stylesheet" type="text/css" media="all"/>
-        <script src="js/jquery.magnific-popup.js" type="text/javascript"></script>
-
-        <div id="small-dialog" class="mfp-hide">
-          
-        </div>
-         <script>
-            $(document).ready(function() {
-            $('.popup-with-zoom-anim').magnificPopup({
-              type: 'inline',
-              fixedContentPos: false,
-              fixedBgPos: true,
-              overflowY: 'auto',
-              closeBtnInside: true,
-              preloader: false,
-              midClick: true,
-              removalDelay: 300,
-              mainClass: 'my-mfp-zoom-in'
-            });
-                                            
-            });
-        </script>
+       
           
   
     </div>
@@ -51,6 +28,7 @@
 </div>
 <div class="login-right">
   <div class="container">
+    {!! (isset( $msg ) ? '<h1 style="color: #f00; text-align: center;" class="msg">'.$msg.'</h1>':'') !!}
     <h3>Teller Login</h3>
     <div class="login-top">
         <div class="form-info">
@@ -83,16 +61,23 @@
         </div>
 
 <script>
-  $(function{
-    $(form).submit(function(e){
-      if( $('input[name="email"])').val() == '' OR $('input[name="password"]').val() ){
+  $(function(){
+    $('input[type="submit"]').click(function(e){
+     
+      var email = $('input[name="email"]').val();
+      var password = $('input[name="password"]').val();
+
+      if( (email == '' || email == 'undefined') || (password == '' || password == 'undefined') ){
         alert('Please supply all information');
         e.preventDefault();
+        
       } else {
-        $(form).submit();
+        $('form').submit();
       }
     });
-
+    setInterval( function(){
+      $('.msg').fadeOut(1000);
+    }, 3000 );
   });
 </script>
 

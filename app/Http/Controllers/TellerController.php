@@ -19,6 +19,7 @@ use Auth;
 use View;
 use DB;
 use App\DateTime;
+use App\Queue;
 
 class TellerController extends Controller {
 
@@ -31,7 +32,7 @@ class TellerController extends Controller {
         $this->data_view['session'] = $this->session;
 
         //all all how many on queue on that teller
-       $queue_pending = Job::where('counterID_fk', $this->session['counter_id'])->get();
+       $queue_pending = Queue::where('counterID_fk', $this->session['counter_id'])->get();
        $queue_pending = count($queue_pending);
        $this->data_view['queue_pending'] = $queue_pending;
 
@@ -286,8 +287,8 @@ class TellerController extends Controller {
         }
         else {
           //@TODO flash error message on the page
-          echo "auth";
-          var_dump($auth);
+          $data['msg'] = 'Invalid login details';
+          return view('teller.login', $data);
         }
     }
     //return which page the teller is assigned to

@@ -7,6 +7,7 @@ use App\Jobs\SendReminderEmail;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\User;
+
 class QueueController extends Controller
 {
     /**
@@ -15,20 +16,13 @@ class QueueController extends Controller
      * @return \Illuminate\Http\Response
      */
   
-
+    public function change_teller(){
+        //update tbl_queue 
+    }
 
     public function index()
     {
-    $i = 0;
-    Queue::push(function($job) use ($i)
-    {
-        // Do the stuff you need here with $username and $password
-        if ($i == 0) {
-            $i++;
-        }
-        // Delete the job from the queue
-        $job->delete();
-    });
+  
     }
 
     /**

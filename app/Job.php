@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Job extends Model
 {
-    protected $table = 'jobs';
+    protected $table = 'tbl_queues';
     protected $primaryKey = 'queue_id';
 
     public function getUser(){
-        return $this->hasOne("App\User", "counter_id", "counter_id" );
+        return $this->hasOne("App\User", "counter_id", "counterID_fk" );
     }
 }

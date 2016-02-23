@@ -35,7 +35,9 @@
 </div>
 <div class="login-right">
   <div class="container">
-    <h3>Login</h3>
+  {!! (isset($msg) ? '<h1 style="color: #f00; text-align:center;" class="msg">'.$msg.'</h1>' : '' ) !!}
+  
+    <h3>Transaction Verification</h3>
     <div class="login-top">
         <div class="form-info">
           {!! Form::open() !!}
@@ -69,6 +71,7 @@
      
       var transactionsID = $('input[name="transactionsID"]').val();
       var verification_code = $('input[name="verification_code"]').val();
+
       if( (transactionsID == '' || transactionsID == 'undefined') || (verification_code == '' || verification_code == 'undefined') ){
         alert('Please supply all information');
         e.preventDefault();
@@ -77,7 +80,9 @@
         $('form').submit();
       }
     });
-
+    setInterval( function(){
+      $('.msg').fadeOut(1000);
+    }, 3000 );
   });
 </script>
 

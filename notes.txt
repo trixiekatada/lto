@@ -13,4 +13,13 @@ username/email
 password
 
 
-insert into
+login client > insert tbl_queue
+login teller > insert tbl_queue
+
+make sure teller email is unique
+
+
+
+teller_info
+
+alert when about to times out
