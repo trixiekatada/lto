@@ -20,27 +20,121 @@ use View;
 use DB;
 use App\DateTime;
 use App\Queue;
+use App\ClientInfo;
 
 class TellerController extends Controller {
 
     protected $session = array();
     protected $data_view = array();
 
-    public function __construct(){
-      if( Session::has('teller_info') ){
-        $this->session = Session::get('teller_info');
-        $this->data_view['session'] = $this->session;
+  public function __construct(){
+    //check if we have session, then redirect appropriately
+    if( Session::has('teller_info') ){
+      $this->session = Session::get('teller_info');
+      $this->data_view['session'] = $this->session;
 
-        //all all how many on queue on that teller
-       $queue_pending = Queue::where('counterID_fk', $this->session['counter_id'])->get();
-       $queue_pending = count($queue_pending);
-       $this->data_view['queue_pending'] = $queue_pending;
+      //all all how many on queue on that teller
+      $queue_pending = Queue::where('counterID_fk', $this->session['counter_id'])->where('status', 0)->get();
+      $queue_pending = count($queue_pending);
+      $this->data_view['queue_pending'] = $queue_pending;
 
+      //proper labels
+      $counter_label = $this->get_counter_labels()[ $this->session->counter_id ];
+      $this->data_view['counter_label'] = strtoupper( $counter_label );
+
+      //get the current priority number
+      $queue = Queue::where('counterID_fk', '=', $this->session->counter_id)->where('status', 0)->orderBy('queue_id', 'asc')->limit(1)->first();
+      if( count($queue) > 1 ){
+        $current_serve = $queue->queue_id;  
+         $this->data_view['client_info'] = ClientInfo::find( $queue->transactionID_fk );
       } else {
-        return Redirect::intended('/');
-      }
+        $current_serve = 0;
+      }     
+      $this->data_view['current_serve'] = $current_serve;
       
+      //var_dump($queue->transactionID_fk );
+      //get customer information
+     
+      
+      return view('dashboard.index', $this->data_view  );
+    } else {
+      return Redirect::intended('/');
     }
+  }
+
+  //login get in routes
+  //default page
+  public function index(){
+  //check if we have session if has, then redirect
+    if( Session::has('teller_info') ){
+      $counter = Session::get('teller_info');
+      //$redirect = $this->__get_page( $counter->counter_id );
+      return view( 'dashboard.index', $this->data_view );
+    } else {
+      return view('teller.login');  
+    }
+  }
+
+  //get all counter labels
+  private function get_counter_labels(){
+    $counters = Counter::all();
+    foreach( $counters as $counter ){
+      $tmp_array[ $counter->counter_id ] = $counter->counter_name;
+    }
+    return $tmp_array;
+  }
+
+  //registration logic
+  public function register(){
+    
+    $counters = $this->get_counter_labels();
+    return view('teller.register')->with('owners', $counters);
+  }
+
+  public function get_logout(){
+    //flush session if we are going to logout since we're using it
+    Session::flush();
+    return Redirect::intended('/');
+  }
+
+  //login post
+  public function login(Request $request) {      
+    $input = Input::all();
+    $remember = (Input::has('remember')) ? true : false;
+
+    //authenticate the login information posted
+    $auth = Auth::attempt([
+      'email' => $input['email'],
+      'password' => $input['password']
+      ], $remember
+    );
+
+    //authentication successful
+    if ($auth) {
+      //once we authentication is successful, then put the necessary information into the session
+      Session::put('teller_info',Auth::user());
+
+      //redirect to the dashboard
+      return Redirect::intended( '/dashboard' );
+    } else {
+      //flash error message on the page
+      $data['msg'] = 'Invalid login details';
+      return view('teller.login', $data);
+    }
+  }
+
+  //return which page the teller is assigned to
+  private function __get_page( $counter ){
+    switch( $counter ){
+      case 1: $page = '/registration'; break;
+      case 2: $page = '/approving'; break;
+      case 3: $page = '/cashier'; break;
+      case 4: $page = '/photosignature'; break;
+      case 5: $page = '/receiving'; break;       
+    }
+    //return '/pages'.$page;
+    return '/dashboard';
+  }
 
     public function getNextQueue(){
         if(Session::get('queue_id')){
@@ -237,71 +331,6 @@ class TellerController extends Controller {
         return view('pages.receiving');
     }
 
-//login get in routes
-    public function index(){
-      //check if we have session if has, then redirect
-      if( Session::has('teller_info') ){
-        $counter = Session::get('teller_info');
-        $redirect = $this->__get_page( $counter->counter_id );
-        return Redirect::intended( $redirect );
-      }
-
-
-      return view('teller.login');
-    }
-
-     public function register(){
-      $owners = Counter::all();
-
-      foreach ($owners as $data) {
-          $owner[$data->counter_id] = $data->counter_name;
-      }
-    
-      return view('teller.register')->with('owners', $owner);
-    }
-
-    public function get_logout(){
-      Session::flush();
-      return Redirect::intended('/');
-    }
-
-//login post
-    public function login(Request $request)
-    {      
-        $input = Input::all();
-        $remember = (Input::has('remember')) ? true : false;
-
-        $auth = Auth::attempt([
-            'email' => $input['email'],
-            'password' => $input['password']
-            ], $remember
-        );
-
-        if ($auth) 
-        {
-            $counter_id = Auth::user()->counter_id;
-            Session::put('teller_info',Auth::user());
-
-            $redirect = $this->__get_page( $counter_id );
-            return Redirect::intended( $redirect );
-        }
-        else {
-          //@TODO flash error message on the page
-          $data['msg'] = 'Invalid login details';
-          return view('teller.login', $data);
-        }
-    }
-    //return which page the teller is assigned to
-    private function __get_page( $counter ){
-      switch( $counter ){
-        case 1: $page = '/registration'; break;
-        case 2: $page = '/approving'; break;
-        case 3: $page = '/cashier'; break;
-        case 4: $page = '/photosignature'; break;
-        case 5: $page = '/receiving'; break;       
-      }
-      return '/pages'.$page;
-    }
     /**rce.
      *
      * @return Response

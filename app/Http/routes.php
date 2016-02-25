@@ -61,6 +61,10 @@ Route::get('/teller/register', 'TellerController@register');
 
 Route::get('/teller/logout', 'TellerController@get_logout');
 
+//dashboard 
+Route::get('/dashboard', 'TellerController@index');
+Route::post('/dashboard', 'QueueController@next_queue');
+
 //queue routes11
 
 

@@ -8,6 +8,13 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\User;
 
+use Session;
+use App\Http\Controllers\ClientController;
+use Input;
+use App\Queue;
+use App\Counter;
+use Redirect;
+
 class QueueController extends Controller
 {
     /**
@@ -22,7 +29,43 @@ class QueueController extends Controller
 
     public function index()
     {
-  
+        if( Session::has('teller_info') ){
+            $this->session = Session::get('teller_info');
+            $this->data_view['session'] = $this->session;
+
+            //all all how many on queue on that teller
+           $queue_pending = Queue::where('counterID_fk', $this->session['counter_id'])->get();
+           $queue_pending = count($queue_pending);
+           $this->data_view['queue_pending'] = $queue_pending;
+            return view('dashboard.index', array('data_view' => $this->data_view ) );
+        } else {
+            return Redirect::intended('/');
+        }
+    }
+
+    public function next_queue(Request $request){
+
+        //check if we have post
+        $method = $request->method();
+       
+        if( $method == 'POST' ){
+            if( Input::has('current_serve') ){
+                $queue = Queue::find( Input::get('current_serve') );
+
+                //check if the current counter is equal to the number of counters
+                $max_counter = Counter::count();
+                var_dump($queue);
+                if( $max_counter == $queue->counterID_fk ){
+                    //update queue
+                    $queue->status = 1;
+                }
+
+                $queue->processID_fk += 1;
+                $queue->counterID_fk += 1;
+                $queue->save();
+                return Redirect::intended('/dashboard');
+            }
+        }
     }
 
     /**

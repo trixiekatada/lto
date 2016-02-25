@@ -54,10 +54,11 @@ class ClientController extends Controller {
     	//once login insert into tbl_queue
 
        $input = Input::all();
+        //get all records from tbl_transactions that will match by the provided information
         $if_record_exist = Transactions::where('transactions_id', Input::get('transactionsID'))->where('verification_code', Input::get('verification_code'))->get();
 
-        
-       if ( $if_record_exist ) {
+        //if we have found record then enqueue
+       if ( count($if_record_exist) > 0 ) {
          //if we have valid transaction then insert in the queue
             $queue = new Queue;
             $queue->transactionID_fk = Input::get('transactionsID');
@@ -65,7 +66,10 @@ class ClientController extends Controller {
             $queue->counterID_fk = 1;            
             $queue->save();
 
-            $data['msg'] = 'Transaction verified';
+            //display the priority number from the last inserted ID
+            $priority_number = $queue->queue_id;
+
+            $data['msg'] = 'Transaction verified <br/> Number: '. $priority_number;
             return view('client.login', $data);
         } else {
             $data['msg'] = 'Transaction unverified, please check your transaction details';

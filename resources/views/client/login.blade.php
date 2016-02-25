@@ -45,7 +45,7 @@
  		       <h4>Transaction ID</h4><br />
             <input type="text" class="text" placeholder="Transaction ID" name="transactionsID" value="{{ old('transactionsID') }}" />
             <h4>Verification Code</h4><br />
-            <input type="text"  placeholder="Verification Code" name="verification_code" />       
+            <input type="password"  placeholder="Verification Code" name="verification_code" />       
         
             <br><br>
              <label class="hvr-sweep-to-right">

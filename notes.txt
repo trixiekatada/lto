@@ -23,3 +23,6 @@ make sure teller email is unique
 teller_info
 
 alert when about to times out
+
+TODO
+transaction type
