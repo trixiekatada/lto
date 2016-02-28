@@ -10,7 +10,7 @@ class Queue extends Model
     
     protected $table = 'tbl_queues';
     protected $primaryKey  = 'queue_id';
-    protected $fillable = ['transactionID_fk','counterID_fk', 'clientID_fk'];
+    protected $fillable = ['transactionID_fk','counterID_fk', 'clientID_fk', 'queue_label'];
 
     //relation to tbl_transactions
     public function transactions(){

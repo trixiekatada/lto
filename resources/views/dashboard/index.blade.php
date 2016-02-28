@@ -89,10 +89,15 @@ MQUE
     </div>
     <h1>Teller {{ $session->counter_id }}</h1>
     <div class="status">
-      <p><label class="red">Currently serving #:</label> <span class="red">{{ $current_serve }}</span></p>
+      <p><label class="red">Currently serving #:</label> <span class="red">{{ $current_serve_label }}</span></p>
     </div>
     <div class="status">
-      <p><label>Total Queue:</label> <span>{{ $queue_pending }}</span></p>
+      <p><label>Total Pending Queue:</label> 
+      @if( $queue_pending > 0 )
+        <a href="#" data-toggle="modal" data-target="#queue_modal" >{{ $queue_pending }}</a></p>
+      @else
+        <span>{{ $queue_pending }}</span></p>
+      @endif
     </div>
 
     <div class="status">
@@ -105,24 +110,60 @@ MQUE
   </div>
   <hr/>
   <div class="container info">
-  {{-- @if( isset($client_info) ) --}}
+  @if( isset($client_info) ) 
   {{-- Display all client information here --}}  
 
     <h2>Client Information</h2>
     <table class="table table-striped">
       <tr> 
         <td>Transaction type:</td>
-        <td>{{-- $transaction_info->transaction_type_name --}}</td>
+        <td>{{ $transaction_info->transaction_type_name }}</td>
       </tr>
       <tr> 
         <td>Name:</td>
-        <td>{{-- $client_info->name --}}</td>
+        <td>{{ $client_info->first_name }} {{ $client_info->last_name }}</td>
       </tr>
     </table>
-  {{-- @endif --}}
+   @endif 
 
 
   </div>
+<!--  queueu modal  -->
+<!-- Modal -->
+<div class="modal fade" id="queue_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Current on Queue</h4>
+      </div>
+      <div class="modal-body">
+       <table class="table table-striped">
+       <thead>
+        <tr>
+          <th>Priority #</th>
+          <th>Name</th>          
+        </tr>
+       </thead>
+       </tbody>
+       @foreach ($queue_pending_details as $queue)
+          <tr>
+            <td>{{ $queue->queue_label }}</td>
+            <td>{{ $queue->first_name }} {{ $queue->last_name }}</td>
+          </tr>
+        @endforeach
+        </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end of queue modal -->
+
 	<div class="footer">
 		<div class="container">
 			<div class="col-md-4 footer-logo">
@@ -138,6 +179,12 @@ MQUE
 <script type="text/javascript">
 
     $(function(){
+          // set minutes
+        var mins = 5;
+        var secs = (mins * 60);
+        var sec_ = secs * 1000;
+        var timeout;
+
         setInterval( function(){
             var formData = new FormData();
             formData.append('current_serve', {{ $current_serve }});
@@ -153,54 +200,46 @@ MQUE
                 window.location.reload();
               }
             });
-        }, 100000);
-    
+        }, sec_);
 
+        //modal
+        function countdown() {
+          timeout = setTimeout(function(){
+             minutes = $('#minutes');
+            seconds = $('#seconds');
+            // if less than a minute remaining
+            console.log(minutes);
+            if (seconds < 59) {
+              seconds.html( secs );
+            } else {
+              min = getminutes();
+              sec = getseconds();
+              minutes.html( min );
+              seconds.html( sec );
+            }
+            secs--;
+            if (secs < 0) {
+              clearTimeout(timeout);
+              return;
+            }
+            countdown();
 
-         // set minutes
-    var mins = 10;
-
-     // calculate the seconds (don't change this! unless time progresses at a      different speed for you...)
-    var secs = mins * 10;
-    var timeout;
-
-    function countdown() {
-      timeout = setTimeout(function(){
-         minutes = $('#minutes');
-        seconds = $('#seconds');
-        // if less than a minute remaining
-        console.log(minutes);
-        if (seconds < 59) {
-          seconds.html( secs );
-        } else {
-          min = getminutes();
-          sec = getseconds();
-          minutes.html( min );
-          seconds.html( sec );
+          }, 1000);
         }
-        secs--;
-        if (secs < 0) {
-          clearTimeout(timeout);
-          return;
+
+       
+        function getminutes() {
+          // minutes is seconds divided by 60, rounded down
+          mins = Math.floor(secs / 60);
+          return ("0" + mins).substr(-2);
         }
-        countdown();
 
-      }, 1000);
-    }
-
-   
-    function getminutes() {
-      // minutes is seconds divided by 60, rounded down
-      mins = Math.floor(secs / 60);
-      return ("0" + mins).substr(-2);
-    }
-
-    function getseconds() {
-      // take mins remaining (as seconds) away from total seconds remaining
-      return ("0" + (secs - Math.round(mins * 60))).substr(-2);
-    }
-    {!! ( $current_serve > 0 ) ? 'countdown();':'' !!}
-    
+        function getseconds() {
+          // take mins remaining (as seconds) away from total seconds remaining
+          return ("0" + (secs - Math.round(mins * 60))).substr(-2);
+        }
+        {!! ( $current_serve > 0 ) ? 'countdown();':'' !!}
+        
 });
     </script>
 </body>

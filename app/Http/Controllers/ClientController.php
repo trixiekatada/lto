@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 
 use App\Transactions;
 use App\Queue;
+use App\ClientInfo;
 
 class ClientController extends Controller {
  
@@ -59,15 +60,28 @@ class ClientController extends Controller {
 
         //if we have found record then enqueue
        if ( count($if_record_exist) > 0 ) {
-         //if we have valid transaction then insert in the queue
+            //if we have valid transaction then insert in the queue
+
+            //get last queue label inserted
+            //this is for the 350 limit per operation day
+            $last_queue = Queue::orderBy('queue_id', 'DESC')->first();
+            $last_queue_label = $last_queue->queue_label;
+            if( $last_queue_label == 350 /* limit per day  */ ){
+                //reset to 0 if reached to 350
+                $new_queue_label = 1;
+            } else {
+                $new_queue_label = $last_queue_label + 1;
+            }
+
             $queue = new Queue;
             $queue->transactionID_fk = Input::get('transactionsID');
             $queue->processID_fk = 1;
-            $queue->counterID_fk = 1;            
+            $queue->counterID_fk = 1;
+            $queue->queue_label = $new_queue_label;             
             $queue->save();
 
             //display the priority number from the last inserted ID
-            $priority_number = $queue->queue_id;
+            $priority_number = $queue->queue_label;
 
             $data['msg'] = 'Transaction verified <br/> Number: '. $priority_number;
             return view('client.login', $data);
@@ -78,5 +92,78 @@ class ClientController extends Controller {
 
     }
 
+    public function register(){
+        return view('client.register');
+    }
+
+    //insert client information
+    public function store(Request $request){
+
+        $data = Input::all();
+
+        //validation rule and logic
+        $rules = [
+            'last_name'=> 'required|string',
+            'first_name' => 'required|string',
+            'gender'=> 'required|string',
+            'birth'=> 'required|string',
+            'address'=> 'required',
+            'mobile'=> 'required|numeric',
+            'email' => 'required|email',
+            'client_type' => 'required|string'
+        ];
+
+        $messages = [
+            'lastname.required'=> 'Should not be empty',
+            'lastname.string' => 'Letters only',
+            'firstname.required' => 'Should not be empty',
+            'firstname.string'=> 'Letters only',
+            'gender.required'=> 'Should not be empty',
+            'gender.string'  => 'Letters only',
+            'birth.required'=> 'Should not be empty',
+            'birthdate.date' => 'Date only',
+            'address.required' => 'Should not be empty',
+            'mobile.required' => 'Should not be empty',
+            'email.required' => 'Should not be empty',
+            'email.email' => 'Should be email'
+        ];
+
+        $validation = Validator::make($data, $rules, $messages);
+        if ($validation->passes()) {
+          
+            //once we have validated insert into tbl_client_info and tbl_transactions
+            $client = new ClientInfo;
+            $client->first_name= $data['first_name'];
+            $client->last_name= $data['last_name'];
+            $client->gender= $data['gender'];
+            $client->birth= $data['birth'];
+            $client->address = $data['address'];
+            $client->mobile  = $data['mobile'];
+            $client->email = $data['email'];
+            $client->client_type = $data['client_type'];
+            $client->save();
+
+            //generated verification code and transaction id
+            $client_inserted_id = $client->client_id;
+
+            $transaction = new Transactions;
+            $transaction->clientID_fk = $client_inserted_id;
+            $transaction->transaction_type = Input::get('transaction_type');
+            //any code as long as it it unique
+            $transaction->verification_code = rand(10000, 1000000);
+            $transaction->save();
+
+            $transaction_inserted_id = $transaction->transactions_id; 
+
+             $data['msg'] = 'Registration Complete <br/> Transaction #: '. $transaction_inserted_id . '<br/> Verification code: '. $transaction->verification_code ;
+            
+            return view('client.register', $data);
+
+            //return Redirect::to('/client/login');
+       } 
+       else {
+            return Redirect::back()->withInput()->withErrors($validation);
+       }
+    }
    
 }

@@ -23,9 +23,7 @@ class QueueController extends Controller
      * @return \Illuminate\Http\Response
      */
   
-    public function change_teller(){
-        //update tbl_queue 
-    }
+   
 
     public function index()
     {
@@ -54,7 +52,9 @@ class QueueController extends Controller
 
                 //check if the current counter is equal to the number of counters
                 $max_counter = Counter::count();
-                var_dump($queue);
+                //echo '<pre>';
+                //var_dump($queue);
+                //exit();
                 if( $max_counter == $queue->counterID_fk ){
                     //update queue
                     $queue->status = 1;
