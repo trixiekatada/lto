@@ -9,7 +9,7 @@ MQUE
 
 
 @section('content')
-
+<title>MQUE Dashboard</title>
 <style type="text/css">
 
     ul li{
@@ -17,12 +17,48 @@ MQUE
         position: relative;
         line-height: 21px;
         text-align: left;
+        margin-right: 10px;     
+        color: #000;
     }
+    ul li:after{
+      content: ' | ';
+    }
+    ul li a, ul li a:active{
+      color: #000;
+    }
+    .status{
+      display: block;
+      float: left;
+      position: relative;
+      width: 33%;
+    }
+    .status p { font-size: 20px; }
+    .red { color: #f00; }
+    .div-status{
+      
+      text-align: center;
+      color: #000;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    .timer {
+      width: 60px; border: none; background-color:none; font-size: 30px; font-weight: bold;
+    }
+    .div-timer{
+      text-align: right;
+      float: right;
+      width: 250px;
+    }
+    .footer {
+      clear: both;
+      position: relative;
+      margin-top: 10px;
+    }
+    span .timer { float: left; }
+    .info { color: #000; }
 </style>
 
 
-
-<title>Index</title>
 <body>
 <div class="header">
     <div class="container">
@@ -30,79 +66,64 @@ MQUE
             <h1><a href="#">MQUES</a></h1>
         </div>
     
-    <div class="top-nav">
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-user"></i>{{ $session['firstname'] }}</a></li>
-            <li><a href="{{ URL::to('/teller/logout') }}">Logout</a></li>
-        </ul>
-    </div>
+      <div class="top-nav">
+          <ul>
+              <li><a href="#">Home</a></li>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#"><i class="glyphicon glyphicon-user"></i>{{ $session['firstname'] }}</a></li>
+              <li><a href="{{ URL::to('/teller/logout') }}">Logout</a></li>
+          </ul>
+      </div>
     </div>
 </div>
 <div class="container">
-
-    <br>
-        <div class="premiumm">
-            <div class="pre-topp">
-            <h5>{{ $counter_label }} Counter</h5>
-            <p>It may change by the teller. Suspend queue manually.</p>
-            </div>
-        </div>
-        <br><br><br>
-
-         
-<br><br><br>
-<ul align="left">
-<div class="pending">
-    <h3>Pending Number : {{ $queue_pending }}</h3>
-    <input type="text">
-</div>
-<div class="total">
-    <h3>Total Number : </h3>
-    <input type="text">
-</div>
-<div class="duration">
-    <h3>Duration time of teller {{ $session->counter_id }} : </h3>
-    <input id="minutes" type="text" style="width: 60px; border: none; background-color:none; font-size: 50px; font-weight: bold;">:
-  <input id="seconds" type="text" style="width: 60px; border: none; background-color:none; font-size: 50px; font-weight: bold;">
-    
-</div>
-<li><div class="project-fur">
-<div align="center"><br><br>
-    <h2>Teller {{ $session->counter_id }}</h2>
-</div>
-<div class="fur">
-<div class="fur1"><br>
-    <h6 class="fur-name">Serving Queue Number : {{ $current_serve }} </h6>
-<br><br><br><br>
-<div align="center">
-<h1>
-    
-</h1></div><br><br><br><br>
-<span>For Evaluation</span>
-
-<span>Customer Name: {{ (isset($client_info->name) ? $client_info->name : '') }}</span>
-<span>Transaction: </span>
-</div>
-</div>     
-</div></li>
-
-</ul>
-
-<div class="future">                            
-        <form method="post" action="">
-            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
-            <input type="hidden" name="current_serve" value="{{ $current_serve }}" />
-            <button class="hvr-sweep-to-right" style="float:right">Next Queue</button>
-        </form>
-        </div><br><br>
-       
+  
+  <div class="pre-topp">
+    <h5>{{ $counter_label }} Counter</h5>
+    <p>It may change by the teller. Suspend queue manually.</p>
+  </div>
+   
+  <div class="row div-status">
+    <div class="div-timer">
+        <span id="minutes" class="timer">00</span> : <span id="seconds" class="timer">00</span>
     </div>
-</div>
-<br><br><br><br><br>
-<br>
-	<div class="footer-bottom">
+    <h1>Teller {{ $session->counter_id }}</h1>
+    <div class="status">
+      <p><label class="red">Currently serving #:</label> <span class="red">{{ $current_serve }}</span></p>
+    </div>
+    <div class="status">
+      <p><label>Total Queue:</label> <span>{{ $queue_pending }}</span></p>
+    </div>
+
+    <div class="status">
+    
+    {!! ( $queue_pending > 0 ) ? '<p><form method="post" action=""><input type="hidden" name="_token" id="token" value="'.csrf_token().'"><input type="hidden" name="current_serve" value="'.$current_serve.'" /><button type="submit" class="btn btn-primary">Next Queue</button></form></p>' : '' !!}
+   
+    
+
+    </div>
+  </div>
+  <hr/>
+  <div class="container info">
+  {{-- @if( isset($client_info) ) --}}
+  {{-- Display all client information here --}}  
+
+    <h2>Client Information</h2>
+    <table class="table table-striped">
+      <tr> 
+        <td>Transaction type:</td>
+        <td>{{-- $transaction_info->transaction_type_name --}}</td>
+      </tr>
+      <tr> 
+        <td>Name:</td>
+        <td>{{-- $client_info->name --}}</td>
+      </tr>
+    </table>
+  {{-- @endif --}}
+
+
+  </div>
+	<div class="footer">
 		<div class="container">
 			<div class="col-md-4 footer-logo">
 				<h2><a href="index.html">MQUES</a></h2>

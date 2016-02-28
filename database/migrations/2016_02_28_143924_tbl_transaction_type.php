@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateJobsTable extends Migration
+class TblTransactionType extends Migration
 {
     /**
      * Run the migrations.
@@ -12,12 +12,8 @@ class CreateJobsTable extends Migration
      */
     public function up()
     {
-        Schema::create('jobs', function (Blueprint $table) {
-            $table->increments('queue_id');
-            $table->integer('queue_number');
-            $table->integer('customer_id');
-            $table->integer('transaction_id');
-            $table->integer('steps');
+        Schema::create('tbl_transaction_type', function (Blueprint $table) {
+            $table->increments('id');
             $table->timestamps();
         });
     }
@@ -29,6 +25,6 @@ class CreateJobsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('jobs');
+        Schema::drop('tbl_transaction_type');
     }
 }

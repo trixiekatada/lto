@@ -21,6 +21,7 @@ use DB;
 use App\DateTime;
 use App\Queue;
 use App\ClientInfo;
+use App\Transactions;
 
 class TellerController extends Controller {
 
@@ -44,12 +45,20 @@ class TellerController extends Controller {
 
       //get the current priority number
       $queue = Queue::where('counterID_fk', '=', $this->session->counter_id)->where('status', 0)->orderBy('queue_id', 'asc')->limit(1)->first();
-      if( count($queue) > 1 ){
+      if( count($queue) > 0 ){
         $current_serve = $queue->queue_id;  
-         $this->data_view['client_info'] = ClientInfo::find( $queue->transactionID_fk );
+        $this->data_view['client_info'] = ClientInfo::find( $queue->transactionID_fk );
+
+         //get transaction type
+        $transaction_info = Transactions::where('transactions_id', '=', $queue->transactionID_fk)->get();
+        $this->data_view['transaction_info'] = $transaction_info;
+        $this->data_view['transaction_info']->transaction_type_name = $this->get_transaction_labels()[ $transaction_info->transaction_type ];
       } else {
         $current_serve = 0;
-      }     
+      }
+
+
+
       $this->data_view['current_serve'] = $current_serve;
       
       //var_dump($queue->transactionID_fk );
@@ -80,6 +89,15 @@ class TellerController extends Controller {
     $counters = Counter::all();
     foreach( $counters as $counter ){
       $tmp_array[ $counter->counter_id ] = $counter->counter_name;
+    }
+    return $tmp_array;
+  }
+
+  //get all transaction type labels
+  private function get_transaction_labels(){
+    $transaction_types = TransactionType::all();
+    foreach( $transaction_types as $transaction_type ){
+      $tmp_array[ $transaction_type_id ] = $tranaction_type->transaction_type_name;
     }
     return $tmp_array;
   }
