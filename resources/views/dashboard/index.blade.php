@@ -42,7 +42,7 @@ MQUE
       margin-top: 15px;
     }
     .timer {
-      width: 60px; border: none; background-color:none; font-size: 30px; font-weight: bold;
+      width: 60px; border: none; background-color:none; font-size: 30px; font-weight: bold; line-height: 30px;
     }
     .div-timer{
       text-align: right;
@@ -154,7 +154,7 @@ MQUE
               }
             });
         }, 100000);
-    });
+    
 
 
          // set minutes
@@ -165,19 +165,18 @@ MQUE
     var timeout;
 
     function countdown() {
-      timeout = setTimeout('Decrement()', 1000);
-    }
-
-    function Decrement() {
-      if (document.getElementById) {
-        minutes = document.getElementById("minutes");
-        seconds = document.getElementById("seconds");
+      timeout = setTimeout(function(){
+         minutes = $('#minutes');
+        seconds = $('#seconds');
         // if less than a minute remaining
+        console.log(minutes);
         if (seconds < 59) {
-          seconds.value = secs;
+          seconds.html( secs );
         } else {
-          minutes.value = getminutes();
-          seconds.value = getseconds();
+          min = getminutes();
+          sec = getseconds();
+          minutes.html( min );
+          seconds.html( sec );
         }
         secs--;
         if (secs < 0) {
@@ -185,9 +184,11 @@ MQUE
           return;
         }
         countdown();
-      }
+
+      }, 1000);
     }
 
+   
     function getminutes() {
       // minutes is seconds divided by 60, rounded down
       mins = Math.floor(secs / 60);
@@ -200,7 +201,7 @@ MQUE
     }
     {!! ( $current_serve > 0 ) ? 'countdown();':'' !!}
     
-
+});
     </script>
 </body>
 @stop

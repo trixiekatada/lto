@@ -53,7 +53,7 @@ Route::post('teller/login', 'TellerController@getLogout'); */
 //queue routes11
 Route::post('queue/change', 'QueueController@change_teller');
 
-Route::get('/teller/login', 'TellerController@index');
+Route::get('/teller/login', 'TellerController@login');
 Route::post('/teller/login', 'TellerController@login');
 
 Route::post('/teller/register', 'TellerController@store');

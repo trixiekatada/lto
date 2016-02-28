@@ -13,20 +13,12 @@
     
         {!!HTML:: style('css/bootstrap.css')!!}
         {!!HTML:: style('css/default.css')!!}
-        {!!HTML:: style('css/flexslider.css')!!}
-        {!!HTML:: style('css/popou-box.css')!!}
+       
         {!!HTML:: style('css/style.css')!!}
         {!!HTML:: style('css/styles.css')!!}
     
          {!!HTML:: script('js/jquery.min.js') !!}
-        {!!HTML:: script('js/easyResponsiveTabs.js') !!}
-        {!!HTML:: script('js/jquery.flexslider.js') !!}
-        {!!HTML:: script('js/jquery.flexisel.js') !!}
-        {!!HTML:: script('js/jquery.magnific-popup.js') !!}
-       
-        {!!HTML:: script('js/responsiveslides.min.js') !!}
-        {!!HTML:: script('js/script.js') !!}
-
+      
        
 
 

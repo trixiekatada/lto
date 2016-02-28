@@ -22,6 +22,7 @@ use App\DateTime;
 use App\Queue;
 use App\ClientInfo;
 use App\Transactions;
+use App\TransactionType;
 
 class TellerController extends Controller {
 
@@ -50,9 +51,10 @@ class TellerController extends Controller {
         $this->data_view['client_info'] = ClientInfo::find( $queue->transactionID_fk );
 
          //get transaction type
-        $transaction_info = Transactions::where('transactions_id', '=', $queue->transactionID_fk)->get();
-        $this->data_view['transaction_info'] = $transaction_info;
-        $this->data_view['transaction_info']->transaction_type_name = $this->get_transaction_labels()[ $transaction_info->transaction_type ];
+       // $transaction_info = Transactions::find( $queue->transactionID_fk);
+      
+        //$this->data_view['transaction_info'] = $transaction_info;
+       // $this->data_view['transaction_info']->transaction_type_name = $this->get_transaction_labels()[ $transaction_info->transaction_type ];
       } else {
         $current_serve = 0;
       }
@@ -78,7 +80,7 @@ class TellerController extends Controller {
     if( Session::has('teller_info') ){
       $counter = Session::get('teller_info');
       //$redirect = $this->__get_page( $counter->counter_id );
-      return view( 'dashboard.index', $this->data_view );
+       return view('dashboard.index', $this->data_view  );
     } else {
       return view('teller.login');  
     }
@@ -97,7 +99,7 @@ class TellerController extends Controller {
   private function get_transaction_labels(){
     $transaction_types = TransactionType::all();
     foreach( $transaction_types as $transaction_type ){
-      $tmp_array[ $transaction_type_id ] = $tranaction_type->transaction_type_name;
+      $tmp_array[ $transaction_type->transaction_type_id ] = $transaction_type->transaction_type_name;
     }
     return $tmp_array;
   }
@@ -116,8 +118,21 @@ class TellerController extends Controller {
   }
 
   //login post
-  public function login(Request $request) {      
+  public function login(Request $request) {    
+
     $input = Input::all();
+    //if we have session then redirect
+    if( Session::has('teller_info') ){
+      $counter = Session::get('teller_info');
+      //$redirect = $this->__get_page( $counter->counter_id );
+       return Redirect::intended('/dashboard');
+    }
+
+    //if we don't have post
+    if( count($input) < 1 ){
+       return view('teller.login');
+    }
+    
     $remember = (Input::has('remember')) ? true : false;
 
     //authenticate the login information posted

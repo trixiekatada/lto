@@ -9,4 +9,8 @@ class Transactions extends Model
     //
     protected $table = 'tbl_transactions';
     protected $primaryKey  = 'transactions_id';
+
+    public function client(){
+    	return $this->has('ClientInfo', 'clientID_fk', 'client_id');
+    }
 }
