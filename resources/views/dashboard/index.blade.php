@@ -56,6 +56,7 @@ MQUE
     }
     span .timer { float: left; }
     .info { color: #000; }
+    .alert_label{ color: #f00; }
 </style>
 
 
@@ -71,7 +72,7 @@ MQUE
               <li><a href="#">Home</a></li>
               <li><a href="#">About Us</a></li>
               <li><a href="#"><i class="glyphicon glyphicon-user"></i>{{ $session['firstname'] }}</a></li>
-              <li><a href="{{ URL::to('/teller/logout') }}">Logout</a></li>
+              <li><a href="{{ URL::to('/teller/logout/?s='.$counter_label_) }}">Logout</a></li>
           </ul>
       </div>
     </div>
@@ -85,6 +86,7 @@ MQUE
    
   <div class="row div-status">
     <div class="div-timer">
+      <span class="alert_label timer">Alert!</span>
         <span id="minutes" class="timer">00</span> : <span id="seconds" class="timer">00</span>
     </div>
 
@@ -181,29 +183,47 @@ MQUE
 <script type="text/javascript">
 
     $(function(){
+
+        blink('.alert_label');
+        $('.alert_label').hide();
           // set minutes
-        var mins = 1;
-        var secs = (mins * 60);
+        var min = {{ $minutes }};
+        var sec = {{ $seconds }};
+        var secs = ( min * 60 ) + sec;
+
         var sec_ = secs * 1000;
         var timeout;
         var alert_prompt = false;
 
-        setInterval( function(){
-            var formData = new FormData();
-            formData.append('current_serve', {{ $current_serve }});
-            formData.append('_token', '{{ csrf_token() }}');
+        if( sec_ > 0 ){
+          setInterval( function(){
+              var formData = new FormData();
+              formData.append('current_serve', {{ $current_serve }});
+              formData.append('_token', '{{ csrf_token() }}');
 
-            $.ajax({
-              url: '/dashboard',
-              data: formData,
-              processData: false,
-              contentType: false,
-              type: 'POST',
-              success: function(data){
-                window.location.reload();
-              }
+              $.ajax({
+                url: '/pages/{{ $counter_label_ }}',
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                success: function(data){
+                  window.location.reload();
+                }
+              });
+          }, sec_);
+        }
+        
+
+        function blink(selector){
+            $(selector).animate({opacity:0}, 50, "linear", function(){
+                $(this).delay(800);
+                $(this).animate({opacity:1}, 50, function(){
+                  blink(this);
+                });
+                $(this).delay(800);
             });
-        }, sec_);
+        }
 
         //modal
         function countdown() {
@@ -227,7 +247,8 @@ MQUE
             }
             //prompt only once if the time is 30 sec below  
             if( secs < 30 && alert_prompt == false){
-              alert('Time is about to run out.');
+              //alert('Time is about to run out.');
+              $('.alert_label').show();
               alert_prompt = true;
             }
             countdown();
@@ -244,7 +265,7 @@ MQUE
 
         function getseconds() {
           // take mins remaining (as seconds) away from total seconds remaining
-          return ("0" + (secs - Math.round(mins * 60))).substr(-2);
+          return ("0" + (secs - Math.round(min * 60))).substr(-2);
         }
         {!! ( $current_serve > 0 ) ? 'countdown();':'' !!}
         

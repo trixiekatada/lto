@@ -32,10 +32,16 @@ class TellerController extends Controller {
   public function __construct(){
     //debugging
     DB::enableQueryLog();
-
+  }
+    
+  private function initialize( $page ){
     //check if we have session, then redirect appropriately
-    if( Session::has('teller_info') ){
-      $this->session = Session::get('teller_info');
+    
+    $session = Session::get('teller_info');
+   
+    if( Session::has($page) ){
+      $this->session = Session::get($page);
+      
       $this->data_view['session'] = $this->session;
 
       //all all how many on queue on that teller
@@ -65,7 +71,7 @@ class TellerController extends Controller {
       //proper labels
       $counter_label = $this->get_counter_labels()[ $this->session->counter_id ];
       $this->data_view['counter_label'] = strtoupper( $counter_label );
-
+      $this->data_view['counter_label_'] = $counter_label;
       //get the current priority number
       $queue = Queue::where('counterID_fk', '=', $this->session->counter_id)
                     ->where('status', 0)
@@ -88,12 +94,24 @@ class TellerController extends Controller {
         $this->data_view['transaction_info'] = $transaction_info;
 
         $this->data_view['transaction_info']->transaction_type_name = $this->get_transaction_labels()[ $transaction_info->transaction_type ];
+
+        //counter timer label
+        $counter_timer = Counter::find( $queue->counterID_fk );
+
+        //get minutes 0h:0m:0s after explode array(0h, 0m, 0s);
+        $counter_timer = explode(':', $counter_timer->estimated_time );
+       //remove leading 0
+        $minutes = ($counter_timer[1] == '00') ? 0 : ltrim($counter_timer[1], '0');
+        $seconds = ($counter_timer[2] == '00') ? 0 : ltrim($counter_timer[2], '0');
       } else {
         $current_serve = 0;
         $current_serve_label = 0;
+        $minutes = 0;
+        $seconds = 0;
       }
 
-
+      $this->data_view['minutes'] = $minutes;
+      $this->data_view['seconds'] = $seconds;
 
       $this->data_view['current_serve'] = $current_serve;
       $this->data_view['current_serve_label'] = $current_serve_label;
@@ -101,10 +119,8 @@ class TellerController extends Controller {
       //get customer information
      
       
-      return view('dashboard.index', $this->data_view  );
-    } else {
-      return Redirect::intended('/');
-    }
+      //return view('dashboard.index', $this->data_view  );
+    } 
   }
 
   //login get in routes
@@ -145,10 +161,82 @@ class TellerController extends Controller {
     return view('teller.register')->with('owners', $counters);
   }
 
-  public function get_logout(){
-    //flush session if we are going to logout since we're using it
-    Session::flush();
+  public function get_logout(Request $request){
+    //flush session if we are going to logout since we're using itr
+    $which = Input::get('s');
+    Session::forget( $which );
     return Redirect::intended('/');
+  }
+
+  public function page_registration(){
+
+    $page = 'registration';   
+    if( Session::has($page) ){
+      $this->initialize($page);
+      return view('dashboard.index', $this->data_view);  
+    } else {
+      return Redirect::intended('/');
+    }
+  }
+
+  public function page_receiving(){
+
+    $page = 'receiving';   
+    if( Session::has($page) ){
+      $this->initialize($page);
+      return view('dashboard.index', $this->data_view);  
+    } else {
+      return Redirect::intended('/');
+    }
+    
+  }
+
+  public function page_approving(){
+
+    $page = 'approving';   
+    if( Session::has($page) ){
+      $this->initialize($page);
+      return view('dashboard.index', $this->data_view);  
+    } else {
+      return Redirect::intended('/');
+    }
+    
+  }
+
+  public function page_photo_and_signature(){
+
+    $page = 'photo_and_signature';   
+    if( Session::has($page) ){
+      $this->initialize($page);
+      return view('dashboard.index', $this->data_view);  
+    } else {
+      return Redirect::intended('/');
+    }
+    
+  }
+
+  public function page_cashier(){
+
+    $page = 'cashier';   
+    if( Session::has($page) ){
+      $this->initialize($page);
+      return view('dashboard.index', $this->data_view);  
+    } else {
+      return Redirect::intended('/');
+    }
+    
+  }
+
+  public function page_releasing(){
+
+    $page = 'releasing';   
+    if( Session::has($page) ){
+      $this->initialize($page);
+      return view('dashboard.index', $this->data_view);  
+    } else {
+      return Redirect::intended('/');
+    }
+    
   }
 
   //login post
@@ -156,11 +244,11 @@ class TellerController extends Controller {
 
     $input = Input::all();
     //if we have session then redirect
-    if( Session::has('teller_info') ){
+    /*if( Session::has('teller_info') ){
       $counter = Session::get('teller_info');
       //$redirect = $this->__get_page( $counter->counter_id );
        return Redirect::intended('/dashboard');
-    }
+    }*/
 
     //if we don't have post
     if( count($input) < 1 ){
@@ -178,11 +266,15 @@ class TellerController extends Controller {
 
     //authentication successful
     if ($auth) {
+      $user = Auth::user();
+      $counter_label = $this->get_counter_labels()[ $user->counter_id ];
+      $counter_label = str_replace(' ', '_', $counter_label);
       //once we authentication is successful, then put the necessary information into the session
-      Session::put('teller_info',Auth::user());
+      Session::put( $counter_label, Auth::user() );
+      
 
       //redirect to the dashboard
-      return Redirect::intended( '/dashboard' );
+      return Redirect::intended( '/pages/'.$counter_label );
     } else {
       //flash error message on the page
       $data['msg'] = 'Invalid login details';
