@@ -52,8 +52,15 @@
               <input type="submit" value="Submit"></a>
                    </label>
           </form>
+
+          <div class="create">
+        <h4>New Teller?</h4>
+        <a class="hvr-sweep-to-right" href="/client/register">Make Transaction</a>
+        <div class="clearfix"> </div>
+      </div>
           {!! Form::close() !!}
         </div>
+
      
   </div>
 </div>

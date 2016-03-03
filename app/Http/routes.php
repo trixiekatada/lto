@@ -44,7 +44,9 @@ Route::get('/teller/logout', 'TellerController@get_logout');
 //dashboard 
 Route::get('/dashboard', 'TellerController@index');
 Route::post('/dashboard', 'QueueController@next_queue');
-
+Route::get('/client/transaction/',function(){
+	return view('client.transaction');
+});
 //queue routes11
 
 

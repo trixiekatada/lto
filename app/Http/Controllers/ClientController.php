@@ -51,7 +51,7 @@ class ClientController extends Controller {
     }
 
     public function post_login(){
-    	//verify post if transaction id exists
+    	//verify post if transaction is exists
     	//once login insert into tbl_queue
 
        $input = Input::all();
@@ -64,9 +64,9 @@ class ClientController extends Controller {
 
             //get last queue label inserted
             //this is for the 350 limit per operation day
-            $last_queue = Queue::orderBy('queue_id', 'DESC')->first();
+            $last_queue = Queue::orderBy('queue_id', 'ASC')->first();
             $last_queue_label = $last_queue->queue_label;
-            if( $last_queue_label == 350 /* limit per day  */ ){
+            if( $last_queue_label == 50 /* limit per day  */ ){
                 //reset to 0 if reached to 350
                 $new_queue_label = 1;
             } else {
@@ -150,7 +150,7 @@ class ClientController extends Controller {
             $transaction->clientID_fk = $client_inserted_id;
             $transaction->transaction_type = Input::get('transaction_type');
             //any code as long as it it unique
-            $transaction->verification_code = rand(10000, 1000000);
+            $transaction->verification_code = rand(10000, 100000);
             $transaction->save();
 
             $transaction_inserted_id = $transaction->transactions_id; 

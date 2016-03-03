@@ -55,7 +55,7 @@ return [
         'mysql' => [
             'driver'    => 'mysql',
             'host'      => 'localhost',
-            'database'  => 'teller',
+            'database'  => 'lto_teller',
             'username'  => 'root',
             'password'  => '',
             'charset'   => 'utf8',

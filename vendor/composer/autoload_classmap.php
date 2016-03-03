@@ -25,6 +25,7 @@ return array(
     'CreateCounter' => $baseDir . '/database/migrations/2016_01_21_043106_create_counter.php',
     'CreateJobsTable' => $baseDir . '/database/migrations/2016_01_21_025916_create_jobs_table.php',
     'CreatePasswordResetsTable' => $baseDir . '/database/migrations/2014_10_12_100000_create_password_resets_table.php',
+    'CreateTeller' => $baseDir . '/database/migrations/2016_02_21_070837_create_teller.php',
     'CreateUsers' => $baseDir . '/database/migrations/2016_01_21_043025_create_users.php',
     'CreateUsersTable' => $baseDir . '/database/migrations/2016_01_21_042921_create_users_table.php',
     'DOMPDF' => $vendorDir . '/dompdf/dompdf/include/dompdf.cls.php',

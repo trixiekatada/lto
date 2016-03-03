@@ -48,10 +48,13 @@ class TellerController extends Controller {
                     ->get();
                  
       //do not display the currently serving queue
-      $first = 0; 
-      $first_queue = $queue_pending[$first];      
-      unset( $queue_pending[$first] );
-      //end 
+      if( count($queue_pending) > 0 && !empty($queue_pending) ){
+        $first = 0; 
+        $first_queue = $queue_pending[$first];      
+        unset( $queue_pending[$first] );
+        //end   
+      }
+      
 
       $this->data_view['queue_pending_details'] = $queue_pending;
 
@@ -73,16 +76,17 @@ class TellerController extends Controller {
                     ->limit(1)
                     ->first();
 
-      if( count($queue) > 0 ){   
+      if( count($queue) > 0 && !empty($queue) ){   
 
         $current_serve = $queue->queue_id;
         $current_serve_label = $queue->queue_label;  
         $this->data_view['client_info'] = $first_queue;
-
+        //var_dump($queue);
         //get transaction type
         $transaction_info = Transactions::find( $queue->transactionID_fk);
-
+       // var_dump($transaction_info);
         $this->data_view['transaction_info'] = $transaction_info;
+
         $this->data_view['transaction_info']->transaction_type_name = $this->get_transaction_labels()[ $transaction_info->transaction_type ];
       } else {
         $current_serve = 0;
@@ -186,22 +190,6 @@ class TellerController extends Controller {
     }
   }
 
-  
-   
-   
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  Request  $request
-     * @return Response
-     */
     public function store(Request $request)
     {
         $data = Request::all();

@@ -87,9 +87,11 @@ MQUE
     <div class="div-timer">
         <span id="minutes" class="timer">00</span> : <span id="seconds" class="timer">00</span>
     </div>
+
     <h1>Teller {{ $session->counter_id }}</h1>
     <div class="status">
-      <p><label class="red">Currently serving #:</label> <span class="red">{{ $current_serve_label }}</span></p>
+      <p><label class="red">Currently serving #:</label>
+      <span class="red">{{ $current_serve_label }}</span></p>
     </div>
     <div class="status">
       <p><label>Total Pending Queue:</label> 
@@ -180,10 +182,11 @@ MQUE
 
     $(function(){
           // set minutes
-        var mins = 5;
+        var mins = 1;
         var secs = (mins * 60);
         var sec_ = secs * 1000;
         var timeout;
+        var alert_prompt = false;
 
         setInterval( function(){
             var formData = new FormData();
@@ -222,10 +225,15 @@ MQUE
               clearTimeout(timeout);
               return;
             }
+            //prompt only once if the time is 30 sec below  
+            if( secs < 30 && alert_prompt == false){
+              alert('Time is about to run out.');
+              alert_prompt = true;
+            }
             countdown();
 
           }, 1000);
-        }
+        } 
 
        
         function getminutes() {
