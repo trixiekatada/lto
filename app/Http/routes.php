@@ -39,7 +39,7 @@ Route::post('/teller/login', 'TellerController@login');
 Route::post('/teller/register', 'TellerController@store');
 Route::get('/teller/register', 'TellerController@register');
 
-Route::get('/teller/logout', 'TellerController@get_logout');
+Route::get('/teller/logout/', 'TellerController@get_logout');
 
 //dashboard 
 Route::get('/dashboard', 'TellerController@index');
@@ -49,5 +49,17 @@ Route::get('/client/transaction/',function(){
 });
 //queue routes11
 
-
+//page routes
+Route::get('/pages/receiving', 'TellerController@page_receiving');
+Route::get('/pages/registration', 'TellerController@page_registration');
+Route::get('/pages/approving', 'TellerController@page_approving');
+Route::get('/pages/photo_and_signature', 'TellerController@page_photo_and_signature');
+Route::get('/pages/cashier', 'TellerController@page_cashier');
+Route::get('/pages/releasing', 'TellerController@page_releasing');
+Route::post('/pages/receiving', 'QueueController@next_queue');
+Route::post('/pages/registration', 'QueueController@next_queue');
+Route::post('/pages/approving', 'QueueController@next_queue');
+Route::post('/pages/photo_and_signature', 'QueueController@next_queue');
+Route::post('/pages/cashier', 'QueueController@next_queue');
+Route::post('/pages/releasing', 'QueueController@next_queue');
 
