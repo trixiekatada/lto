@@ -139,7 +139,7 @@ return [
         Illuminate\Html\HtmlServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
-       
+        //Libern\QRCodeReader\QRCodeReader::class,       
 
 
         /*
@@ -202,7 +202,7 @@ return [
         'HTML'      => Illuminate\Html\HtmlFacade::class,
         'PDF'       => Barryvdh\DomPDF\Facade::class,
         'QrCode'    => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
-        
+        //'Libern'    => Libern\QRCodeReader\QRCodeReader::class,
     ],
 
 ];

@@ -20,7 +20,8 @@ Route::get('/', function () {
 
 
 //client routes
-Route::get('/client/login', 'UnitController@viewTransaction');
+//Route::get('/client/login', 'UnitController@viewTransaction');
+Route::get('/client/login', 'ClientController@index');
 Route::post('/client/login', 'ClientController@post_login');
 
 Route::post('/client/register', 'ClientController@store');
@@ -41,9 +42,13 @@ Route::get('/teller/register', 'TellerController@register');
 
 Route::get('/teller/logout/', 'TellerController@get_logout');
 
+Route::get('/queue', 'QueueController@view_all');
+
 //dashboard 
 Route::get('/dashboard', 'TellerController@index');
 Route::post('/dashboard', 'QueueController@next_queue');
+
+
 Route::get('/client/transaction/',function(){
 	return view('client.transaction');
 });

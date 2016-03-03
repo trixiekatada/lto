@@ -47,6 +47,7 @@ class ClientController extends Controller {
     }
 
     public function index(){
+      
     	return view('client.login');
     }
 
@@ -55,8 +56,50 @@ class ClientController extends Controller {
     	//once login insert into tbl_queue
 
        $input = Input::all();
+       //check if we have client info
+       $if_client_exists = ClientInfo::where('email', Input::get('email'))->where('password', Hash::make(Input::get('password')) )->get();
+
+       if( count($if_client_exists) > 0 ){
+            $if_record_exist = Transactions::where('transactions_id', Input::get('transactionsID'))->where('verification_code', Input::get('verification_code'))->get();
+
+            //if we have found record then enqueue
+           if ( count($if_record_exist) > 0 ) {
+                //if we have valid transaction then insert in the queue
+
+                //get last queue label inserted
+                //this is for the 350 limit per operation day
+                $last_queue = Queue::orderBy('queue_id', 'ASC')->first();
+                $last_queue_label = $last_queue->queue_label;
+                if( $last_queue_label == 50 /* limit per day  */ ){
+                    //reset to 0 if reached to 350
+                    $new_queue_label = 1;
+                } else {
+                    $new_queue_label = $last_queue_label + 1;
+                }
+
+                $queue = new Queue;
+                $queue->transactionID_fk = Input::get('transactionsID');
+                $queue->processID_fk = 1;
+                $queue->counterID_fk = 1;
+                $queue->queue_label = $new_queue_label;             
+                $queue->save();
+
+                //display the priority number from the last inserted ID
+                $priority_number = $queue->queue_label;
+
+                $data['msg'] = 'Transaction verified <br/> Number: '. $priority_number;
+                return view('client.login', $data);
+            } else {
+                $data['msg'] = 'Transaction unverified, please check your transaction details';
+                return view('client.login', $data);
+            }
+
+
+       }
+
+
         //get all records from tbl_transactions that will match by the provided information
-        $if_record_exist = Transactions::where('transactions_id', Input::get('transactionsID'))->where('verification_code', Input::get('verification_code'))->get();
+       /* $if_record_exist = Transactions::where('transactions_id', Input::get('transactionsID'))->where('verification_code', Input::get('verification_code'))->get();
 
         //if we have found record then enqueue
        if ( count($if_record_exist) > 0 ) {
@@ -66,7 +109,7 @@ class ClientController extends Controller {
             //this is for the 350 limit per operation day
             $last_queue = Queue::orderBy('queue_id', 'ASC')->first();
             $last_queue_label = $last_queue->queue_label;
-            if( $last_queue_label == 50 /* limit per day  */ ){
+            if( $last_queue_label == 50 /* limit per day   ){
                 //reset to 0 if reached to 350
                 $new_queue_label = 1;
             } else {
@@ -89,6 +132,8 @@ class ClientController extends Controller {
             $data['msg'] = 'Transaction unverified, please check your transaction details';
             return view('client.login', $data);
         }
+        */
+
 
     }
 
@@ -141,11 +186,13 @@ class ClientController extends Controller {
             $client->mobile  = $data['mobile'];
             $client->email = $data['email'];
             $client->client_type = $data['client_type'];
+            $client->password = Hash::make($data['password']);
             $client->save();
 
             //generated verification code and transaction id
             $client_inserted_id = $client->client_id;
 
+            //insert first to get the transaction_id inserted then use it to the qr_code
             $transaction = new Transactions;
             $transaction->clientID_fk = $client_inserted_id;
             $transaction->transaction_type = Input::get('transaction_type');
@@ -153,7 +200,21 @@ class ClientController extends Controller {
             $transaction->verification_code = rand(10000, 100000);
             $transaction->save();
 
-            $transaction_inserted_id = $transaction->transactions_id; 
+            $transaction_inserted_id = $transaction->transactions_id;
+            $transaction_to_update = Transactions::find($transaction_inserted_id);
+
+            //qr code
+            $qr_code_filename = $transaction_to_update->transactions_id;
+            $qr_code_filename = strtolower($qr_code_filename);
+            $qr_code_filename = $qr_code_filename.'_'.uniqid().'.png';
+            $qr_code_full_filename = base_path().'/images/qrcode/'.$qr_code_filename;
+            \QrCode::format('png')->size(250)->generate($transaction_to_update->transactions_id, $qr_code_full_filename);
+            $transaction_to_update->qrcode_url = $qr_code_full_filename;
+            $transaction_to_update->save();
+
+            
+
+             
 
              $data['msg'] = 'Registration Complete <br/> Transaction #: '. $transaction_inserted_id . '<br/> Verification code: '. $transaction->verification_code ;
             

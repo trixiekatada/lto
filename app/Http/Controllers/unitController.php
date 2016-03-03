@@ -9,12 +9,13 @@ use App\Libern\QRCodeReader\QRCodeReader;
 use App\Users;
 use App\Validator;
 use App\Http\Controllers\DB;
-use App\Transaction;
+use App\Transactions;
+use App\ClientInfo;
 use Session;
 use Input;
 
 
-class unitController extends Controller
+class UnitController extends Controller
 {
 public function viewHome()
 {
@@ -23,13 +24,13 @@ public function viewHome()
 public function viewTransaction()
 {
     $id = Input::get('id');
-    $transaction = Transaction::find($id);
+    $transaction = Transactions::find($id);
     return view('pages.transaction',compact('transaction'));
 }
 
 public function printData(){
 
-	 $datas = Transaction::find(5)->get();
+	 $datas = Transactions::find(5)->get();
        
         foreach ($datas as $data_variables)
 

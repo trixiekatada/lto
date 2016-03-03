@@ -85,7 +85,9 @@
             <input type="text" name="birth"   placeholder="Birthdate" required="" >
             <input type="text" name="mobile"   placeholder="Mobile Number" required="" >
             <input type="text" name="gender"  placeholder="Gender" required="" >
-            <input type="text" name="email"  value="{{ old('email') }}" placeholder="Email" required="" >
+            <input type="text" name="email"  value="{{ old('email') }}" placeholder="Email" required
+            ="" >
+            <input type="password" name="password" value="" placeholder="Password" />
             <select name="client_type">
               <option value="0">Regular</option>
               <option value="1">Senior Citizen</option>

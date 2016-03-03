@@ -21,12 +21,7 @@
     <div class="clearfix"> </div>
   
          
-        <link href="css/popuo-box.css" rel="stylesheet" type="text/css" media="all"/>
-        <script src="js/jquery.magnific-popup.js" type="text/javascript"></script>
-
-        <div id="small-dialog" class="mfp-hide">
-          
-        </div>
+       
        
   
     </div>
@@ -39,9 +34,13 @@
   
     <h3>Transaction Verification</h3>
     <div class="login-top">
-        <div class="form-info">
+         <div class="form-info">
           {!! Form::open() !!}
            <form class="form-horizontal" role="form" method="POST" action="/client/login">
+             <h4>Email</h4><br />
+            <input type="text" class="email" placeholder="Email" name="email" value="{{ old('email') }}" />
+            <h4>Password</h4><br />
+            <input type="password"  placeholder="Password" name="password" />
  		       <h4>Transaction ID</h4><br />
             <input type="text" class="text" placeholder="Transaction ID" name="transactionsID" value="{{ old('transactionsID') }}" />
             <h4>Verification Code</h4><br />
@@ -60,7 +59,7 @@
       </div>
           {!! Form::close() !!}
         </div>
-
+<!--<div id="camera"></div>-->
      
   </div>
 </div>
@@ -90,6 +89,49 @@
     setInterval( function(){
       $('.msg').fadeOut(1000);
     }, 5000 );
+
+
+    
+
+
+    $("#camera").webcam({
+      width: 320,
+      height: 240,
+      mode: "callback",
+      swffile: "/js/jscam_canvas_only.swf",
+      onTick: function(remain) {
+
+          if (0 == remain) {
+              jQuery("#status").text("Cheese!");
+          } else {
+              jQuery("#status").text(remain + " seconds remaining...");
+          }
+      },
+
+      onSave: function(data) {
+
+          var col = data.split(";");
+      // Work with the picture. Picture-data is encoded as an array of arrays... Not really nice, though =/
+      },
+
+      onCapture: function () {
+          webcam.save();
+
+        // Show a flash for example
+      },
+
+      debug: function (type, string) {
+          // Write debug information to console.log() or a div, ...
+      },
+
+      onLoad: function () {
+      // Page load
+          var cams = webcam.getCameraList();
+          for(var i in cams) {
+              jQuery("#cams").append("<li>" + cams[i] + "</li>");
+          }
+      }
+    });
   });
 </script>
 
