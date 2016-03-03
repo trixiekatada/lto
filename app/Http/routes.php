@@ -20,7 +20,7 @@ Route::get('/', function () {
 
 
 //client routes
-Route::get('/client/login', 'ClientController@index');
+Route::get('/client/login', 'UnitController@viewTransaction');
 Route::post('/client/login', 'ClientController@post_login');
 
 Route::post('/client/register', 'ClientController@store');
