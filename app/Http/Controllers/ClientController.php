@@ -21,6 +21,7 @@ use App\User;
 use App\Transactions;
 use App\Queue;
 use App\ClientInfo;
+use App\RegisterLicense;
 
 class ClientController extends Controller {
  
@@ -153,7 +154,10 @@ class ClientController extends Controller {
 
      public function rl_view()
     {   
-        $data = User::all();
+        //get username from session
+        $client_id = Session::get('client_info'); //[0]->client_id;
+        $client_id = $client_id[0]->client_id;
+        $data = User::find( $client_id );
         return view('client.registerLicense')->with('data',$data);
     }
 
@@ -168,7 +172,7 @@ class ClientController extends Controller {
         $rules = array(
                 'first_name' => 'required|string',
                 'last_name' => 'required|string',
-                'address' => 'require|string',
+                'address' => 'required|string',
                 'nationality' => 'required|string',
                 'gender' => 'required',
                 'birthdate' => 'required|string',
@@ -224,9 +228,21 @@ class ClientController extends Controller {
             $license->fathername = $data['fathername'];
             $license->mothername = $data['mothername']; 
             $license->save();
-            return Redirect::to('/home')
-                ->with('flash_error', 'Successful')
-                ->with('flash_color', '#0A819C');
+
+            $license_inserted_id = $license->rl_id;
+            $license_to_update = RegisterLicense::find($license_inserted_id);
+             //qr code
+            $qr_code_filename = $license_to_update->rl_id;
+            $qr_code_filename = strtolower($qr_code_filename);
+            $qr_code_filename = $qr_code_filename.'_'.uniqid().'.png';
+            $qr_code_full_filename = base_path().'/images/qrcode/'.$qr_code_filename;
+            \QrCode::format('png')->size(250)->generate($license_to_update->rl_id, $qr_code_full_filename);
+            $license_to_update->qrcode = $qr_code_full_filename;
+            $license_to_update->save();
+
+
+
+            return Redirect::to('/intopdfRL/?rl_id='. $license_inserted_id );
         }
         else 
        {
@@ -239,14 +255,14 @@ class ClientController extends Controller {
 
     //convert the form to Pdf
     public function RLtoPDF(){
-
-        $id = Auth::id();
         
-        $data = licenseRegister::where('id','=', $id)->get();
-        foreach ($data as $data)
-
-
-
+        //get data to generate from url query string
+        $id = Input::get('rl_id');
+        $data = RegisterLicense::find($id);
+     
+        $full_name = ucwords($data->first_name.' '.$data->last_name);
+        $file_name = 'License Registration - '. $full_name .'.pdf' ;
+        
         $pdf = \App::make('dompdf.wrapper');
         $content = '<style type="text/css">
                     .form-style-6{
@@ -288,7 +304,7 @@ class ClientController extends Controller {
                     <div class="form-style-6">
                     <h1>License Registration</h1>
                     <ul>
-                        <li>Name: '.$data->name.' 
+                        <li>Name: '.$full_name.' 
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             &nbsp;
@@ -360,7 +376,7 @@ class ClientController extends Controller {
         
 
         $pdf->loadHTML($content);
-        return $pdf->stream();  
+        return $pdf->stream( $file_name, array('Attachment' => false));  
 
 
     }

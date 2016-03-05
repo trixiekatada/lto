@@ -85,4 +85,4 @@ Route::get('/client/registerLicense',function(){
 });
 Route::get('/client/registerLicense','ClientController@rl_view');
 Route::post('/client/registerLicense','ClientController@rLicense');
-Route::get('/intopdfRL', 'ClientController@RLtoPDF');
+Route::get('/intopdfRL/', 'ClientController@RLtoPDF');
