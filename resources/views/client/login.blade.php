@@ -33,7 +33,7 @@
   {!! (isset($msg) ? '<h1 style="color: #f00; text-align:center;" class="msg">'.$msg.'</h1>' : '' ) !!}
   
     <h3>Transaction Verification</h3>
-    <div class="login-top">
+    <!-- <div class="login-top">
          <div class="form-info">
           {!! Form::open() !!}
            <form class="form-horizontal" role="form" method="POST" action="/client/login">
@@ -58,9 +58,20 @@
         <div class="clearfix"> </div>
       </div>
           {!! Form::close() !!}
-        </div>
-<!--<div id="camera"></div>-->
-     
+        </div> -->
+<div  class="center" id="reader" style="width:300px;height:280px;"></div>
+
+<h6 class="center">QR Code Information:</h6>
+<span id="read" class="center"></span>
+<br>
+
+<h6 class="center">Read Error:</h6>
+
+<span id="read_error" class="center"></span>
+
+<br>
+<h6 class="center">Video Error:</h6>
+<span id="vid_error" class="center"></span>
   </div>
 </div>
 </div> 
@@ -90,48 +101,21 @@
       $('.msg').fadeOut(1000);
     }, 5000 );
 
+    $('#reader').html5_qrcode(function(data){
+      $('#read').html(data);
+      window.location = 'http://localhost:8000/qrcode/?rl_id=' + data;
+    },
+    function(error){
+      $('#read_error').html(error);
+    }, function(videoError){
+      $('#vid_error').html(videoError);
+    }
+  );
+
+ 
+
 
     
-
-
-    $("#camera").webcam({
-      width: 320,
-      height: 240,
-      mode: "callback",
-      swffile: "/js/jscam_canvas_only.swf",
-      onTick: function(remain) {
-
-          if (0 == remain) {
-              jQuery("#status").text("Cheese!");
-          } else {
-              jQuery("#status").text(remain + " seconds remaining...");
-          }
-      },
-
-      onSave: function(data) {
-
-          var col = data.split(";");
-      // Work with the picture. Picture-data is encoded as an array of arrays... Not really nice, though =/
-      },
-
-      onCapture: function () {
-          webcam.save();
-
-        // Show a flash for example
-      },
-
-      debug: function (type, string) {
-          // Write debug information to console.log() or a div, ...
-      },
-
-      onLoad: function () {
-      // Page load
-          var cams = webcam.getCameraList();
-          for(var i in cams) {
-              jQuery("#cams").append("<li>" + cams[i] + "</li>");
-          }
-      }
-    });
   });
 </script>
 

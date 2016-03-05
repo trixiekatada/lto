@@ -78,6 +78,7 @@ class QueueController extends Controller
 
         //check if we have post
         $method = $request->method();
+        $request_url = $_SERVER['REQUEST_URI'];
        
         if( $method == 'POST' ){
             if( Input::has('current_serve') ){
@@ -96,8 +97,12 @@ class QueueController extends Controller
                 $queue->processID_fk += 1;
                 $queue->counterID_fk += 1;
                 $queue->save();
-                return Redirect::intended('/dashboard');
+                
+            } else if( Input::has('start') ) {
+                Session::put('start', true);
+               
             }
+            return Redirect::intended($request_url);
         }
     }
 

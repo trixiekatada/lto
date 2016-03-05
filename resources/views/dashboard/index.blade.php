@@ -106,8 +106,14 @@ MQUE
 
     <div class="status">
     
-    {!! ( $queue_pending > 0 ) ? '<p><form method="post" action=""><input type="hidden" name="_token" id="token" value="'.csrf_token().'"><input type="hidden" name="current_serve" value="'.$current_serve.'" /><button type="submit" class="btn btn-primary">Next Queue</button></form></p>' : '' !!}
+    @if ( $queue_pending > 0 AND $start === true ) 
+    
+      <p><form method="post" action=""><input type="hidden" name="_token" id="token" value="'.csrf_token().'"><input type="hidden" name="current_serve" value="'.$current_serve.'" /><button type="submit" class="btn btn-primary">Next Queue</button></form></p>
+    @endif
    
+    @if( isset($start) AND $start === false )
+      <p><form method="post" action=""><input type="hidden" name="_token" id="token" value="{{ csrf_token() }}"><input type="hidden" value="true" name="start"/> <button type="submit" class="btn btn-primary">Start</button></form></p>
+    @endif
     
 
     </div>
@@ -121,7 +127,7 @@ MQUE
     <table class="table table-striped">
       <tr> 
         <td>Transaction type:</td>
-        <td>{{ $transaction_info->transaction_type_name }}</td>
+        <td>License Registration</td>
       </tr>
       <tr> 
         <td>Name:</td>
@@ -150,12 +156,14 @@ MQUE
         </tr>
        </thead>
        </tbody>
-       @foreach ($queue_pending_details as $queue)
-          <tr>
-            <td>{{ $queue->queue_label }}</td>
-            <td>{{ $queue->first_name }} {{ $queue->last_name }}</td>
-          </tr>
-        @endforeach
+       @if ( !empty($queue_pending_details) )
+         @foreach ($queue_pending_details as $queue)
+            <tr>
+              <td>{{ $queue->queue_label }}</td>
+              <td>{{ $queue->first_name }} {{ $queue->last_name }}</td>
+            </tr>
+          @endforeach
+        @endif
         </tbody>
         </table>
       </div>

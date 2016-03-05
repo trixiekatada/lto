@@ -8,11 +8,11 @@
                 var width = currentElem.width();
 
                 if (height == null) {
-                    height = 250;
+                    height = 300;
                 }
 
                 if (width == null) {
-                    width = 300;
+                    width = 280;
                 }
 
                 var vidElem = $('<video width="' + width + 'px" height="' + height + 'px"></video>').appendTo(currentElem);

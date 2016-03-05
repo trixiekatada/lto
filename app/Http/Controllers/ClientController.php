@@ -152,6 +152,13 @@ class ClientController extends Controller {
         } 
     }
 
+    public function getLogout(){
+        Session::flush();
+        return Redirect::intended('/');
+    }
+
+
+
      public function rl_view()
     {   
         //get username from session
@@ -379,6 +386,95 @@ class ClientController extends Controller {
         return $pdf->stream( $file_name, array('Attachment' => false));  
 
 
+    }
+
+    public function qrcodeToPDF(){
+
+        
+        //get data to generate from url query string
+        $id = Input::get('rl_id');
+        $data = RegisterLicense::find($id);
+
+        //get priority number
+        //this is for the 350 limit per operation day
+        $last_queue = Queue::orderBy('queue_label', 'DESC')->orderBy('created_at', 'DESC')->first();
+        $last_queue_label = $last_queue->queue_label;
+        if( $last_queue_label == 50 /* limit per day  */ ){
+            //reset to 0 if reached to 350
+            $priority_number = 1;
+        } else {
+            $priority_number = $last_queue_label + 1;
+        }
+
+
+        $queue = new Queue;
+        $queue->transactionID_fk = $id;
+        $queue->processID_fk = 1;
+        $queue->counterID_fk = 1;
+        $queue->queue_label = $priority_number;             
+        $queue->save();
+
+        
+     
+        $full_name = ucwords($data->first_name.' '.$data->last_name);
+        $file_name = 'License Registration - '. $full_name .'.pdf' ;
+        
+        $pdf = \App::make('dompdf.wrapper');
+        $content = '<style type="text/css">
+                    .form-style-6{
+                        font: 85% Arial, Helvetica, sans-serif;
+                        max-width: 800px;
+                        margin: 5px auto;
+                        padding: 10px;
+                        background: #F7F7F7;    
+                    }
+                    .form-style-6 h1{
+                        background: #43D1AF;
+                        padding: 20px 0;
+                        font-size: 120%;
+                        font-weight: 300;
+                        text-align: center;
+                        color: #fff;
+                        margin: -13px -13px 13px -13px;
+                    }   
+                    .form-style-6 ul{
+                        padding:0;
+                        margin:0;
+                        list-style:none;
+                    }
+                    .form-style-6 ul li{
+                        display: block;
+                        margin-bottom: 10px;
+                        min-height: 35px;
+                        }
+
+                    </style>
+
+                    <!DOCTYPE html> 
+                    <html>
+                    <head>
+                    <title>MQues</title>
+                    </head>
+                    <body>
+                    
+                    <div class="form-style-6">
+                    <h1>License Registration</h1>
+                    <ul>
+                        <li>Transaction type: License Registration</li>
+                        <li>Name: '. $full_name.'</li>
+                        <li>Priority Number: '.$priority_number.'<li>
+                    </ul>
+                </body>
+                </html>';
+
+        
+        
+
+        $pdf->loadHTML($content);
+        return $pdf->stream( $file_name, array('Attachment' => false));  
+
+
+    
     }
 
     //insert client information

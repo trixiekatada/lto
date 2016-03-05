@@ -23,6 +23,7 @@ use App\Queue;
 use App\ClientInfo;
 use App\Transactions;
 use App\TransactionType;
+use App\RegisterLicense;
 
 class TellerController extends Controller {
 
@@ -32,94 +33,108 @@ class TellerController extends Controller {
   public function __construct(){
     //debugging
     DB::enableQueryLog();
+
+    
   }
     
   private function initialize( $page ){
     //check if we have session, then redirect appropriately
     
-    $session = Session::get('teller_info');
-   
+    $this->session = Session::get($page);
+    $counter_label = $this->get_counter_labels()[ $this->session->counter_id ];
+    $this->data_view['counter_label'] = strtoupper( $counter_label );
+    $this->data_view['counter_label_'] = $counter_label;
+
+
     if( Session::has($page) ){
+      $this->data_view['start'] = true;
       $this->session = Session::get($page);
       
       $this->data_view['session'] = $this->session;
 
-      //all all how many on queue on that teller
-      $queue_pending = Queue::where('counterID_fk', $this->session['counter_id'])
-                    ->where('status', 0)
-                    ->leftJoin('tbl_transactions', 'transactions_id', '=', 'transactionID_fk')
-                    ->leftJoin('tbl_client_info', 'client_id', '=', 'clientID_fk')
-                    ->orderBy('queue_id', 'asc')
-                    ->orderByRaw('FIELD("client_type", "1,2,0")')
-                    ->get();
-                 
-      //do not display the currently serving queue
-      if( count($queue_pending) > 0 && !empty($queue_pending) ){
-        $first = 0; 
-        $first_queue = $queue_pending[$first];      
-        unset( $queue_pending[$first] );
-        //end   
-      }
+      //check if the teller is starting to accept clients
+      if( Session::has('start') ){
+      
+        //all all how many on queue on that teller
+        $queue_pending = Queue::where('counterID_fk', $this->session['counter_id'])
+                      ->where('status', 0)
+                        ->leftJoin('tbl_register_license', 'rl_id', '=', 'transactionID_fk')
+                      ->leftJoin('tbl_client_info', 'tbl_client_info.client_id', '=', 'tbl_register_license.client_id')
+                      ->orderBy('queue_id', 'asc')
+                      ->orderByRaw('FIELD("client_type", "1,2,0")')
+                      ->get();
+                   
+        //do not display the currently serving queue
+        if( count($queue_pending) > 0 && !empty($queue_pending) ){
+          $first = 0; 
+          $first_queue = $queue_pending[$first];      
+          unset( $queue_pending[$first] );
+          //end   
+        }
       
 
-      $this->data_view['queue_pending_details'] = $queue_pending;
+        $this->data_view['queue_pending_details'] = $queue_pending;
 
-      $queue_pending = count($queue_pending);
-      $this->data_view['queue_pending'] = $queue_pending;
+        $queue_pending = count($queue_pending);
+        $this->data_view['queue_pending'] = $queue_pending;
 
-      //var_dump(DB::getQueryLog());
-      //proper labels
-      $counter_label = $this->get_counter_labels()[ $this->session->counter_id ];
-      $this->data_view['counter_label'] = strtoupper( $counter_label );
-      $this->data_view['counter_label_'] = $counter_label;
-      //get the current priority number
-      $queue = Queue::where('counterID_fk', '=', $this->session->counter_id)
-                    ->where('status', 0)
-                    ->leftJoin('tbl_transactions', 'transactions_id', '=', 'transactionID_fk')
-                    ->leftJoin('tbl_client_info', 'client_id', '=', 'clientID_fk')
-                    ->orderBy('queue_id', 'asc')
-                    ->orderByRaw('FIELD("client_type", "1,2,0")')
-                    ->limit(1)
-                    ->first();
+        //var_dump(DB::getQueryLog());
+        //proper labels
+      
+        //get the current priority number
+        $queue = Queue::where('counterID_fk', '=', $this->session->counter_id)
+                      ->where('status', 0)
+                      ->leftJoin('tbl_register_license', 'rl_id', '=', 'transactionID_fk')
+                      ->leftJoin('tbl_client_info', 'tbl_client_info.client_id', '=', 'tbl_register_license.client_id')
+                      ->orderBy('queue_id', 'asc')
+                      ->orderByRaw('FIELD("client_type", "1,2,0")')
+                      ->limit(1)
+                      ->first();
 
-      if( count($queue) > 0 && !empty($queue) ){   
+        if( count($queue) > 0 && !empty($queue) ){   
 
-        $current_serve = $queue->queue_id;
-        $current_serve_label = $queue->queue_label;  
-        $this->data_view['client_info'] = $first_queue;
-        //var_dump($queue);
-        //get transaction type
-        $transaction_info = Transactions::find( $queue->transactionID_fk);
-       // var_dump($transaction_info);
-        $this->data_view['transaction_info'] = $transaction_info;
+          $current_serve = $queue->queue_id;
+          $current_serve_label = $queue->queue_label;  
+          $this->data_view['client_info'] = $first_queue;
+          //var_dump($queue);
+          //get transaction type
+          $transaction_info = RegisterLicense::find( $queue->transactionID_fk);
+         // var_dump($transaction_info);
+          $this->data_view['transaction_info'] = $transaction_info;
 
-        $this->data_view['transaction_info']->transaction_type_name = $this->get_transaction_labels()[ $transaction_info->transaction_type ];
+          //$this->data_view['transaction_info']->transaction_type_name = $this->get_transaction_labels()[ $transaction_info->transaction_type ];
 
-        //counter timer label
-        $counter_timer = Counter::find( $queue->counterID_fk );
+          //counter timer label
+          $counter_timer = Counter::find( $queue->counterID_fk );
 
-        //get minutes 0h:0m:0s after explode array(0h, 0m, 0s);
-        $counter_timer = explode(':', $counter_timer->estimated_time );
-       //remove leading 0
-        $minutes = ($counter_timer[1] == '00') ? 0 : ltrim($counter_timer[1], '0');
-        $seconds = ($counter_timer[2] == '00') ? 0 : ltrim($counter_timer[2], '0');
+          //get minutes 0h:0m:0s after explode array(0h, 0m, 0s);
+          $counter_timer = explode(':', $counter_timer->estimated_time );
+         //remove leading 0
+          $minutes = ($counter_timer[1] == '00') ? 0 : ltrim($counter_timer[1], '0');
+          $seconds = ($counter_timer[2] == '00') ? 0 : ltrim($counter_timer[2], '0');
+        } else {
+          $current_serve = 0;
+          $current_serve_label = 0;
+          $minutes = 0;
+          $seconds = 0;
+        }
+
+        $this->data_view['minutes'] = $minutes;
+        $this->data_view['seconds'] = $seconds;
+
+        $this->data_view['current_serve'] = $current_serve;
+        $this->data_view['current_serve_label'] = $current_serve_label;
+      
       } else {
-        $current_serve = 0;
-        $current_serve_label = 0;
-        $minutes = 0;
-        $seconds = 0;
+           $this->data_view['minutes'] = 0;
+        $this->data_view['seconds'] = 0;
+
+        $this->data_view['current_serve'] = 0;
+        $this->data_view['current_serve_label'] = 0;
+        $this->data_view['queue_pending'] = 0;
+        $this->data_view['queue_pending_details'] = 0;
+        $this->data_view['start'] = false;
       }
-
-      $this->data_view['minutes'] = $minutes;
-      $this->data_view['seconds'] = $seconds;
-
-      $this->data_view['current_serve'] = $current_serve;
-      $this->data_view['current_serve_label'] = $current_serve_label;
-      //var_dump($queue->transactionID_fk );
-      //get customer information
-     
-      
-      //return view('dashboard.index', $this->data_view  );
     } 
   }
 
@@ -165,6 +180,7 @@ class TellerController extends Controller {
     //flush session if we are going to logout since we're using itr
     $which = Input::get('s');
     Session::forget( $which );
+    Session::forget('start');
     return Redirect::intended('/');
   }
 
@@ -254,6 +270,8 @@ class TellerController extends Controller {
     if( count($input) < 1 ){
        return view('teller.login');
     }
+
+
     
     $remember = (Input::has('remember')) ? true : false;
 
@@ -267,6 +285,7 @@ class TellerController extends Controller {
     //authentication successful
     if ($auth) {
       $user = Auth::user();
+
       $counter_label = $this->get_counter_labels()[ $user->counter_id ];
       $counter_label = str_replace(' ', '_', $counter_label);
       //once we authentication is successful, then put the necessary information into the session

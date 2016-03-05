@@ -20,7 +20,10 @@
          {!!HTML:: script('js/jquery.min.js') !!}
       
        {!!HTML:: script('js/bootstrap.min.js') !!}
-       {!!HTML:: script('js/jquery.webcam.min.js') !!}
+       
+       {!!HTML:: script('src/html5-qrcode.js') !!}
+       {!!HTML:: script('src/lib/html5-qrcode.min.js') !!}
+       {!!HTML:: script('src/lib/jsqrcode-combined.min.js') !!}
 
        
   @yield('content')

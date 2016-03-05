@@ -21,7 +21,7 @@ Route::get('/client/login1', function(){
 	return view('client.login1');
 });
 Route::post('/client/login1', 'ClientController@p_login');
-Route::get('/client/logout', 'Auth\AuthController@getLogout');
+Route::get('/client/logout', 'ClientController@getLogout');
 
 Route::controllers([
    'password' => 'Auth\PasswordController',
@@ -86,3 +86,5 @@ Route::get('/client/registerLicense',function(){
 Route::get('/client/registerLicense','ClientController@rl_view');
 Route::post('/client/registerLicense','ClientController@rLicense');
 Route::get('/intopdfRL/', 'ClientController@RLtoPDF');
+
+Route::get('/qrcode/', 'ClientController@qrcodeToPDF');
