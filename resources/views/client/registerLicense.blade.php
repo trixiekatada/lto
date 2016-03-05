@@ -44,7 +44,7 @@
                 <label class="col-md-3 control-label">First Name</label>
                 <div class="col-md-9">
                     
-                    <input type="text" class="form-control" name="first_name" value"{{ $data->first_name }}">
+                    <input type="text" class="form-control" name="first_name" value="{{ $data->first_name }}">
                
                 </div>
             </div>
@@ -53,13 +53,13 @@
             <div class="form-group">
                 <label for="last_name" class="col-md-3 control-label">Last Name</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="last_name" value"{{ $data->last_name }}">
+                    <input type="text" class="form-control" name="last_name" value="{{ $data->last_name }}">
                 </div>
             </div>
             <div class="form-group">
                 <label for="first_name" class="col-md-3 control-label">Address</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="address" value"{{ $data->address }}">
+                    <input type="text" class="form-control" name="address" value="{{ $data->address }}">
                 </div>
             </div>     @endforeach
             <div class="form-group">
