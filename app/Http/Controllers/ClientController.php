@@ -17,7 +17,7 @@ use View;
 use DB;
 use App\DateTime;
 use Illuminate\Http\Request;
-
+use App\User;
 use App\Transactions;
 use App\Queue;
 use App\ClientInfo;
@@ -137,8 +137,232 @@ class ClientController extends Controller {
 
     }
 
+    //customer side
+    public function p_login(){
+        $input = Input::all();
+
+        $login = User::where('username',Input::get('username'))->where('password', Input::get('password'))->get();
+
+        //login succeded?
+       if( count($login) > 0){
+            Session::put( 'client_info', $login );
+            
+            return view( '/client/index' );
+        } 
+    }
+
+     public function rl_view()
+    {   
+        $data = User::all();
+        return view('client.registerLicense')->with('data',$data);
+    }
+
     public function register(){
         return view('client.register');
+    }
+    //store transaction
+    public function rLicense(Request $request){
+
+        $data = Input::all();
+
+        $rules = array(
+                'first_name' => 'required|string',
+                'last_name' => 'required|string',
+                'address' => 'require|string',
+                'nationality' => 'required|string',
+                'gender' => 'required',
+                'birthdate' => 'required|string',
+                'height' => 'required|numeric',
+                'weight' => 'required|numeric',
+                'telno' => 'required|numeric',
+                'TOA' => 'required',
+                'TLA' => 'required',
+                'DSA' => 'required',
+                'EA' => 'required',
+                'bloodtype' => 'required|string',
+                'donor' => 'required|string',
+                'civilstatus' => 'required',
+                'hair' => 'required',
+                'eyes' => 'required',
+                'built' => 'required',
+                'complexion' => 'required',
+                'birth_place' => 'required|string',
+                'fathername' => 'required|string',
+                'mothername' => 'required|string',
+        );
+
+        $validation = Validator::make($data, $rules);
+        
+        if($validation->passes()) {
+            $license = new RegisterLicense;
+
+            $client_info = Session::get('client_info');
+            $id = $client_info[0]->client_id;
+            $license->client_id = $id;
+            $license->first_name = $data['first_name'];
+            $license->last_name = $data['last_name'];
+            $license->address = $data['address'];
+            $license->nationality = $data['nationality'];
+            $license->gender = $data['gender'];
+            $license->birthdate = $data['birthdate'];
+            $license->height = $data['height'];
+            $license->weight = $data['weight'];
+            $license->telno = $data['telno'];
+            $license->TOA = $data['TOA'];
+            $license->TLA = $data['TLA'];
+            $license->DSA = $data['DSA'];
+            $license->EA = $data['EA'];
+            $license->bloodtype = $data['bloodtype'];
+            $license->donor = $data['donor'];
+            $license->civilstatus = $data['civilstatus'];
+            $license->hair = $data['hair'];
+            $license->eyes = $data['eyes'];
+            $license->built = $data['built'];
+            $license->complexion = $data['complexion'];
+            $license->date = $data['date'];
+            $license->birthplace = $data['birth_place'];
+            $license->fathername = $data['fathername'];
+            $license->mothername = $data['mothername']; 
+            $license->save();
+            return Redirect::to('/home')
+                ->with('flash_error', 'Successful')
+                ->with('flash_color', '#0A819C');
+        }
+        else 
+       {
+           exit();
+           return Redirect::back()
+               ->withErrors($validation)
+               ->with('flash_error', 'Validation Errors!');
+       }
+    }
+
+    //convert the form to Pdf
+    public function RLtoPDF(){
+
+        $id = Auth::id();
+        
+        $data = licenseRegister::where('id','=', $id)->get();
+        foreach ($data as $data)
+
+
+
+        $pdf = \App::make('dompdf.wrapper');
+        $content = '<style type="text/css">
+                    .form-style-6{
+                        font: 85% Arial, Helvetica, sans-serif;
+                        max-width: 800px;
+                        margin: 5px auto;
+                        padding: 10px;
+                        background: #F7F7F7;    
+                    }
+                    .form-style-6 h1{
+                        background: #43D1AF;
+                        padding: 20px 0;
+                        font-size: 120%;
+                        font-weight: 300;
+                        text-align: center;
+                        color: #fff;
+                        margin: -13px -13px 13px -13px;
+                    }   
+                    .form-style-6 ul{
+                        padding:0;
+                        margin:0;
+                        list-style:none;
+                    }
+                    .form-style-6 ul li{
+                        display: block;
+                        margin-bottom: 10px;
+                        min-height: 35px;
+                        }
+
+                    </style>
+
+                    <!DOCTYPE html> 
+                    <html>
+                    <head>
+                    <title>MQues</title>
+                    </head>
+                    <body>
+                    
+                    <div class="form-style-6">
+                    <h1>License Registration</h1>
+                    <ul>
+                        <li>Name: '.$data->name.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;
+                        Present Address: '.$data->address.' </li>
+
+                        <li>Nationality: '.$data->nationality.'
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                        Gender: '.$data->gender.'</li>
+                          
+
+                        <li>Birthday: '.$data->birth.'
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Height: '.$data->height.'</li>
+
+                        <li>Weight: '.$data->weight.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Tel/Cp No: '.$data->telNo.' </li>
+                        
+
+                        <li>Type of Application(TOA): '.$data->TOA.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Type of License Applied for(TLA): '.$data->TLA.'</li>
+
+                        <li>Driving Skill Acquired or Will be Acquired Thru(DSA): '.$data->DSA.' 
+                           
+                        <li>Educational Attainment(EA): '.$data->EA.' </li>
+                        
+
+                        <li>Blood Type: '.$data->bloodType.'
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Organ Donor?: '.$data->donorBoolean.'</li>
+
+                        <li>Civil Status: '.$data->civilStatus.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;
+                        Hair: '.$data->hair.' </li>
+                        
+
+                        <li>Eyes: '.$data->eyes.'
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Built: '.$data->built.' </li>
+
+                        <li>Complexion: '.$data->complexion.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;
+                        Birt Place: '.$data->birthPlace.' </li>
+                        
+
+                        <li>Fathers Name: '.$data->fatherName.' 
+                        <li>Mothers Name: '.$data->motherName.' 
+                        <li>Date Filed: '.$data->date.'
+                        
+                 <center><h3>Your QR Code:</h3><img src='.$data->qrcode.'>
+                </body>
+                </html>';
+
+        
+        
+
+        $pdf->loadHTML($content);
+        return $pdf->stream();  
+
+
     }
 
     //insert client information

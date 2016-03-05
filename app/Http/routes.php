@@ -17,7 +17,15 @@ Route::get('/', function () {
     return view('user.index');
 });	
 
+Route::get('/client/login1', function(){
+	return view('client.login1');
+});
+Route::post('/client/login1', 'ClientController@p_login');
+Route::get('/client/logout', 'Auth\AuthController@getLogout');
 
+Route::controllers([
+   'password' => 'Auth\PasswordController',
+]);
 
 //client routes
 //Route::get('/client/login', 'UnitController@viewTransaction');
@@ -68,3 +76,13 @@ Route::post('/pages/photo_and_signature', 'QueueController@next_queue');
 Route::post('/pages/cashier', 'QueueController@next_queue');
 Route::post('/pages/releasing', 'QueueController@next_queue');
 
+//customer routes
+Route::get('/client/index',function(){
+	return view('client.index');
+});
+Route::get('/client/registerLicense',function(){
+	return view('client.registerLicense');
+});
+Route::get('/client/registerLicense','ClientController@rl_view');
+Route::post('/client/registerLicense','ClientController@rLicense');
+Route::get('/intopdfRL', 'ClientController@RLtoPDF');

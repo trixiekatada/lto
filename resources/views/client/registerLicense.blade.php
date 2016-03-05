@@ -36,43 +36,48 @@
         <div class="panel-title">Register License Form (Please Fill up correctly)</div>
     </div>  
     <div class="panel-body" >
+    @foreach($data as $data)
         <form id="signupform" class="form-horizontal" role="form" method="POST">
-        	<input type="hidden" name="_token" value="{{ csrf_token() }}">
-	
+        	<input type="hidden" name="_token" >
+	        
             <div class="form-group">
-                <label for="first_name" class="col-md-3 control-label">First Name</label>
+                <label class="col-md-3 control-label">First Name</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="first_name" placeholder="">
+                    
+                    <input type="text" class="form-control" name="first_name" value"{{ $data->first_name }}">
+               
                 </div>
             </div>
+            
+
             <div class="form-group">
                 <label for="last_name" class="col-md-3 control-label">Last Name</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="last_name" placeholder="">
+                    <input type="text" class="form-control" name="last_name" value"{{ $data->last_name }}">
                 </div>
             </div>
             <div class="form-group">
                 <label for="first_name" class="col-md-3 control-label">Address</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="address" placeholder="">
+                    <input type="text" class="form-control" name="address" value"{{ $data->address }}">
                 </div>
-            </div>
+            </div>     @endforeach
             <div class="form-group">
                 <label for="first_name" class="col-md-3 control-label">Nationality</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="nationality" placeholder="">
+                    <input type="text" class="form-control" name="nationality"  value="{{ old('nationality') }}">
                 </div>
             </div>
             <div class="form-group">
                 <label for="first_name" class="col-md-3 control-label">Gender</label>
                 <div class="col-md-9">
-                    <?php echo Form::select('gender', array('Female' => 'Female', 'Male' => 'Male'));?>
+                    {!! Form::select('gender', array('Female' => 'Female', 'Male' => 'Male')); !!}
             	</div>
         	</div>
         	<div class="form-group">
                 <label for="first_name" class="col-md-3 control-label">Birthdate</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="birthdate" placeholder="">
+                    <input type="text" class="form-control" name="birthdate" value"">
                 </div>
             </div>
             <div class="form-group">
@@ -96,15 +101,15 @@
             <div class="form-group">
                 <label for="first_name" class="col-md-3 control-label">Type of Application</label>
                 <div class="col-md-9">
-                    <?php echo Form::select('TOA', array('New' => 'New', 'Delinquent_Dormant_Liscence' => 'Delinquent/Dormant Liscence', 'Change_Classification' => (array('Proof_to_Non-Proof' => 'Proof to Non-Proof', 'Non-Proof_to_Proof' => 'Non-Proof to Proof' )), 'Foreign_Lic_Convertion' => 'Foreign Licencse Convertion',
+                    {!! Form::select('TOA', array('New' => 'New', 'Delinquent_Dormant_Liscence' => 'Delinquent/Dormant Liscence', 'Change_Classification' => (array('Proof_to_Non-Proof' => 'Proof to Non-Proof', 'Non-Proof_to_Proof' => 'Non-Proof to Proof' )), 'Foreign_Lic_Convertion' => 'Foreign Licencse Convertion',
 						'Renewal' => 'Renewal', 'Additional_Restriction_Code' => 'Additional Restriction Code', 'Duplicate' => 'Duplicate', 'Change_Civil_Status' => 'Change Civil Status', 'Change_Name' => 'Change Name',
-						'Change_Of_Birth' => 'Change Of Birth', 'Others' => 'Others' ));?>
+						'Change_Of_Birth' => 'Change Of Birth', 'Others' => 'Others' )); !!}
                 </div>
             </div>
               <div class="form-group">
                 <label for="first_name" class="col-md-3 control-label">Type of license Applied</label>
                 <div class="col-md-9">
-                    <?php  echo Form::select('TLA', array('Student_Permit' => 'Student Permit', 'Non-Proofesional' => 'Non-Proofesional', 'Professional' => 'Professional', 'Conductor' => 'Conductor'));?>
+                    {!! Form::select('TLA', array('Student_Permit' => 'Student Permit', 'Non-Proofesional' => 'Non-Proofesional', 'Professional' => 'Professional', 'Conductor' => 'Conductor')); !!}
                 </div>
             </div>
               <div class="form-group">
@@ -135,7 +140,7 @@
             <div class="form-group">
                 <label for="password" class="col-md-3 control-label">Civil Status</label>
                 <div class="col-md-9">
-                    <?php echo Form::select('civilStatus', array('Single' => 'Single', 'Married' => 'Married', 'Window'.'/'.'er' => 'Window/er', 'Separeted' => 'Separated'));?>
+                    <?php echo Form::select('civilstatus', array('Single' => 'Single', 'Married' => 'Married', 'Window'.'/'.'er' => 'Window/er', 'Separeted' => 'Separated'));?>
                 </div>
             </div>
             <div class="form-group">
@@ -170,9 +175,9 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="icode" class="col-md-3 control-label">Birth Place</label>
+                <label for="birthplace" class="col-md-3 control-label">Birth Place</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="birthdate" placeholder="">
+                    <input type="text" class="form-control" name="birth_place" placeholder="">
                 </div>
             </div>
             <div class="form-group">
@@ -187,6 +192,8 @@
                     <input type="text" class="form-control" name="fathername" placeholder="">
                 </div>
             </div>
+
+            
             <div style="border-top: 1px solid #999; padding-top:50px"  class="form-group">
             
 
@@ -195,7 +202,6 @@
                 </div>                                           
                     
             </div>
-            
             
             
         </form>

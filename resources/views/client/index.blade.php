@@ -68,7 +68,7 @@
 		
 		<div class="top-nav">
 			<ul class="right-icons">
-                 <li><a href="#"><i class="glyphicon glyphicon-user"></i>{{ $client['firstname'] }}</a></li>
+                 <li><a href="#"><i class="glyphicon glyphicon-user"></i></a></li>
 				<li><a  href="{{ URL::to('/auth/logout') }}"><i class="glyphicon glyphicon-user"> </i>Logout</a></li>
 				
 				
