@@ -68,10 +68,10 @@
 		
 		<div class="top-nav">
 			<ul class="right-icons">
-                 <li><a href="#"><i class="glyphicon glyphicon-user"></i></a></li>
+
+                 <li><a href="#"><i class="glyphicon glyphicon-user" value=""></i></a></li>
 				<li><a  href="{{ URL::to('/auth/logout') }}"><i class="glyphicon glyphicon-user"> </i>Logout</a></li>
-				
-				
+
 			</ul>
 				   
 				
@@ -113,7 +113,7 @@
                                     </div>
                                 </div>
                                 <br /><br><br>
-                           <div style="margin-top:10px" class="form-group">
+                             <div style="margin-top:10px" class="form-group">
                                      <div class="col-sm-12 controls">
                                       <a id="btn-login" href="registerVehicle" class="hvr-sweep-to-right">Vehicle Registration </a>
                                     </div>

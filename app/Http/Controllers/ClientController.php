@@ -27,7 +27,7 @@ class ClientController extends Controller {
  
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
   
-  	protected $loginPath = 'client/login';
+  	//protected $loginPath = 'client/login';
 
     /**
      * Create a new authentication controller instance.
@@ -156,15 +156,13 @@ class ClientController extends Controller {
         Session::flush();
         return Redirect::intended('/');
     }
-
-
-
+    
      public function rl_view()
     {   
         //get username from session
         $client_id = Session::get('client_info'); //[0]->client_id;
         $client_id = $client_id[0]->client_id;
-        $data = User::find( $client_id );
+        $data = ClientInfo::find( $client_id );
         return view('client.registerLicense')->with('data',$data);
     }
 
@@ -246,8 +244,6 @@ class ClientController extends Controller {
             \QrCode::format('png')->size(250)->generate($license_to_update->rl_id, $qr_code_full_filename);
             $license_to_update->qrcode = $qr_code_full_filename;
             $license_to_update->save();
-
-
 
             return Redirect::to('/intopdfRL/?rl_id='. $license_inserted_id );
         }
@@ -447,7 +443,53 @@ class ClientController extends Controller {
                         margin-bottom: 10px;
                         min-height: 35px;
                         }
-
+                    .alert {
+                          padding: 15px;
+                          margin-bottom: 20px;
+                          border: 1px solid transparent;
+                          border-radius: 4px;
+                        }
+                    .alert-info {
+                          color: #31708f;
+                          background-color: #d9edf7;
+                          border-color: #bce8f1;
+                        }
+                    .btn-primary {
+                          color: #fff;
+                          background-color: #337ab7;
+                          border-color: #2e6da4;
+                        }
+                    .btn {
+                          display: inline-block;
+                          padding: 6px 12px;
+                          margin-bottom: 0;
+                          font-size: 14px;
+                          font-weight: normal;
+                          line-height: 1.42857143;
+                          text-align: center;
+                          white-space: nowrap;
+                          vertical-align: middle;
+                          -ms-touch-action: manipulation;
+                              touch-action: manipulation;
+                          cursor: pointer;
+                          -webkit-user-select: none;
+                             -moz-user-select: none;
+                              -ms-user-select: none;
+                                  user-select: none;
+                          background-image: none;
+                          border: 1px solid transparent;
+                          border-radius: 4px;
+                        }
+                        .btn-xs,
+                            .btn-group-xs > .btn {
+                              padding: 1px 5px;
+                              font-size: 12px;
+                              line-height: 1.5;
+                              border-radius: 3px;
+                            }
+                        .pull-right {
+                              float: right !important;
+                            }
                     </style>
 
                     <!DOCTYPE html> 
@@ -464,17 +506,17 @@ class ClientController extends Controller {
                         <li>Name: '. $full_name.'</li>
                         <li>Priority Number: '.$priority_number.'<li>
                     </ul>
+                    </div>
+                    <center>
+                    <button>
+                        Print
+                    </button>
+                    
                 </body>
                 </html>';
 
-        
-        
-
         $pdf->loadHTML($content);
         return $pdf->stream( $file_name, array('Attachment' => false));  
-
-
-    
     }
 
     //insert client information
@@ -491,28 +533,28 @@ class ClientController extends Controller {
             'address'=> 'required',
             'mobile'=> 'required|numeric',
             'email' => 'required|email',
-            'client_type' => 'required|string'
+            'username'=> 'required|string',
         ];
 
         $messages = [
-            'lastname.required'=> 'Should not be empty',
-            'lastname.string' => 'Letters only',
-            'firstname.required' => 'Should not be empty',
-            'firstname.string'=> 'Letters only',
+            'last_name.required'=> 'Should not be empty',
+            'last_name.string' => 'Letters only',
+            'first_name.required' => 'Should not be empty',
+            'first_name.string'=> 'Letters only',
             'gender.required'=> 'Should not be empty',
             'gender.string'  => 'Letters only',
             'birth.required'=> 'Should not be empty',
-            'birthdate.date' => 'Date only',
+            'birth.date' => 'Date only',
             'address.required' => 'Should not be empty',
             'mobile.required' => 'Should not be empty',
             'email.required' => 'Should not be empty',
-            'email.email' => 'Should be email'
+            'email.email' => 'Should be email',
+            'username.required'=> 'Should not be empty'
         ];
 
         $validation = Validator::make($data, $rules, $messages);
         if ($validation->passes()) {
-          
-            //once we have validated insert into tbl_client_info and tbl_transactions
+
             $client = new ClientInfo;
             $client->first_name= $data['first_name'];
             $client->last_name= $data['last_name'];
@@ -521,42 +563,36 @@ class ClientController extends Controller {
             $client->address = $data['address'];
             $client->mobile  = $data['mobile'];
             $client->email = $data['email'];
-            $client->client_type = $data['client_type'];
-            $client->password = Hash::make($data['password']);
+            $client->username = $data['username'];
+            $client->password = $data['password'];
+            $client->confirmpassword = $data['confirmPassword'];
             $client->save();
 
             //generated verification code and transaction id
-            $client_inserted_id = $client->client_id;
+            //$client_inserted_id = $client->client_id;
 
             //insert first to get the transaction_id inserted then use it to the qr_code
-            $transaction = new Transactions;
-            $transaction->clientID_fk = $client_inserted_id;
-            $transaction->transaction_type = Input::get('transaction_type');
-            //any code as long as it it unique
-            $transaction->verification_code = rand(10000, 100000);
-            $transaction->save();
+            // $transaction = new Transactions;
+            // $transaction->clientID_fk = $client_inserted_id;
+            // $transaction->transaction_type = Input::get('transaction_type');
+            // //any code as long as it it unique
+            // $transaction->verification_code = rand(10000, 100000);
+            // $transaction->save();
 
-            $transaction_inserted_id = $transaction->transactions_id;
-            $transaction_to_update = Transactions::find($transaction_inserted_id);
+            // $transaction_inserted_id = $transaction->transactions_id;
+            // $transaction_to_update = Transactions::find($transaction_inserted_id);
 
             //qr code
-            $qr_code_filename = $transaction_to_update->transactions_id;
-            $qr_code_filename = strtolower($qr_code_filename);
-            $qr_code_filename = $qr_code_filename.'_'.uniqid().'.png';
-            $qr_code_full_filename = base_path().'/images/qrcode/'.$qr_code_filename;
-            \QrCode::format('png')->size(250)->generate($transaction_to_update->transactions_id, $qr_code_full_filename);
-            $transaction_to_update->qrcode_url = $qr_code_full_filename;
-            $transaction_to_update->save();
+            // $qr_code_filename = $transaction_to_update->transactions_id;
+            // $qr_code_filename = strtolower($qr_code_filename);
+            // $qr_code_filename = $qr_code_filename.'_'.uniqid().'.png';
+            // $qr_code_full_filename = base_path().'/images/qrcode/'.$qr_code_filename;
+            // \QrCode::format('png')->size(250)->generate($transaction_to_update->transactions_id, $qr_code_full_filename);
+            // $transaction_to_update->qrcode_url = $qr_code_full_filename;
+            // $transaction_to_update->save();
 
-            
-
-             
-
-             $data['msg'] = 'Registration Complete <br/> Transaction #: '. $transaction_inserted_id . '<br/> Verification code: '. $transaction->verification_code ;
-            
-            return view('client.register', $data);
-
-            //return Redirect::to('/client/login');
+            // $data['msg'] = 'Registration Complete <br/> Transaction #: '. $transaction_inserted_id . '<br/> Verification code: '. $transaction->verification_code ;
+            return Redirect::to('/client/login');
        } 
        else {
             return Redirect::back()->withInput()->withErrors($validation);

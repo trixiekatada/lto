@@ -83,7 +83,7 @@ MQUE
     <h5>{{ $counter_label }} Counter</h5>
     <p>It may change by the teller. Suspend queue manually.</p>
   </div>
-   
+
   <div class="row div-status">
     <div class="div-timer">
       <span class="alert_label timer">Alert!</span>
@@ -108,7 +108,7 @@ MQUE
     
     @if ( $queue_pending > 0 AND $start === true ) 
     
-      <p><form method="post" action=""><input type="hidden" name="_token" id="token" value="'.csrf_token().'"><input type="hidden" name="current_serve" value="'.$current_serve.'" /><button type="submit" class="btn btn-primary">Next Queue</button></form></p>
+      <p><form method="post" action=""><input type="hidden" name="_token" id="token" value="{{csrf_token()}}"><input type="hidden" name="current_serve" value="{{ $current_serve }}" /><button type="submit" class="btn btn-primary">Next Queue</button></form></p>
     @endif
    
     @if( isset($start) AND $start === false )
@@ -189,7 +189,6 @@ MQUE
 	</div>
 
 <script type="text/javascript">
-
     $(function(){
 
         blink('.alert_label');
@@ -276,7 +275,6 @@ MQUE
           return ("0" + (secs - Math.round(min * 60))).substr(-2);
         }
         {!! ( $current_serve > 0 ) ? 'countdown();':'' !!}
-        
 });
     </script>
 </body>

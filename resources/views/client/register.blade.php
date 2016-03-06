@@ -50,8 +50,7 @@
     <!--//logo-->
     <div class="top-nav">
       <ul class="right-icons">
-        <li><span ><i class="glyphicon glyphicon-phone"> </i>Your Number here!</span></li>
-        <li><a  href="{{ URL::to('/teller/login') }}"><i class="glyphicon glyphicon-user"> </i>Login</a></li>
+        <li><a  href="{{ URL::to('/client/login') }}"><i class="glyphicon glyphicon-user"> </i>Login</a></li>
       </ul>
     
     <div class="clearfix"> </div>
@@ -69,43 +68,46 @@
 
 <div class="login-right">
   <div class="container">
-  @if ( isset($msg) )
-    <h1 style="color: #f00; text-align:center;" class="msg"> {!! $msg !!} </h1 >
-  @endif
     <h3>Register</h3>
     <div class="login-top">
         <div class="form-info">
+           <div class="span3">
           {!! Form::open() !!}
         <form class="form-horizontal" role="form" method="POST" action="">
-          <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
-            <input type="text" name="first_name" value="{{ old('name') }}" placeholder="First Name" required="" >
-            <input type="text" name="last_name" value="{{ old('name') }}"  placeholder="Last Name" required="" >
-            <input type="text" name="address" placeholder="Address" required="" >
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <label>First Name</label>
+            <input type="text" name="first_name" class="span3" required="" >
+            <label>Last Name</label>
+            <input type="text" name="last_name" class="span3" required="" >
+            <label>Address</label>
+            <input type="text" name="address" class="span3" required="" >
+            <label>Birthdate : </label>
             <input type="text" name="birth"   placeholder="Birthdate" required="" >
+            <label>Mobile # : </label>
             <input type="text" name="mobile"   placeholder="Mobile Number" required="" >
+            <label>Gender : </label>
             <input type="text" name="gender"  placeholder="Gender" required="" >
-            <input type="text" name="email"  value="{{ old('email') }}" placeholder="Email" required
-            ="" >
-            <input type="password" name="password" value="" placeholder="Password" />
-            <select name="client_type">
-              <option value="0">Regular</option>
-              <option value="1">Senior Citizen</option>
-              <option value="2">Person with disability</option>
-            </select><br/>
-            <select name="transaction_type">
-              <option value="1">License Application</option>
-              <option value="2">License Renewal</option>
-              <option value="3">Vehicle Registration</option>
-            </select>
+            <label>Email : </label>
+            <input type="text" name="email"  value="{{ old('email') }}" placeholder="Email" required="" >
+            <label>Username</label>
+            <input type="text" name="username" class="span3" required="" >
+            <label>Password</label>
+            <input type="password" name="password" class="span3" required="" >
+            <label >Confirm Password</label>
+            <input type="password" class="span3" name="confirmPassword" required="" >
+   
+
+      <br/>
+       
             <br><br>
             <label class="hvr-sweep-to-right">
-              <button type="submit">sign up</button>
+              <button type="submit">Register</button>
             
             </label>
           </form>
+          </div>
           {!! Form::close() !!}
-          <p>Already have a Real Home account? <a href="/teller/login">Login</a></p>
+     
         </div>
       
   </div>
