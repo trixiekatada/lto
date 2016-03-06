@@ -98,9 +98,9 @@ MQUE
     <div class="status">
       <p><label>Total Pending Queue:</label> 
       @if( $queue_pending > 0 )
-        <a href="#" data-toggle="modal" data-target="#queue_modal" >{{ $queue_pending }}</a></p>
+        <a href="#" data-toggle="modal" data-target="#queue_modal" id="queue_pending" >{{ $queue_pending }}</a></p>
       @else
-        <span>{{ $queue_pending }}</span></p>
+        <a href="#" data-toggle="modal" data-target="#queue_modal" id="queue_pending" >{{ $queue_pending }}</a></p>
       @endif
     </div>
 
@@ -108,7 +108,11 @@ MQUE
     
     @if ( $queue_pending > 0 AND $start === true ) 
     
+<<<<<<< HEAD
       <p><form method="post" action=""><input type="hidden" name="_token" id="token" value="{{csrf_token()}}"><input type="hidden" name="current_serve" value="{{ $current_serve }}" /><button type="submit" class="btn btn-primary">Next Queue</button></form></p>
+=======
+      <p><form method="post" action=""><input type="hidden" name="_token" id="token" value="{{ csrf_token() }}"><input type="hidden" name="current_serve" value="{{ $current_serve }}" /><button type="submit" class="btn btn-primary">Next Queue</button></form></p>
+>>>>>>> 62a45adb836f96b926d848cb4fba45ce42ab7147
     @endif
    
     @if( isset($start) AND $start === false )
@@ -148,14 +152,14 @@ MQUE
         <h4 class="modal-title" id="myModalLabel">Current on Queue</h4>
       </div>
       <div class="modal-body">
-       <table class="table table-striped">
+       <table class="table table-striped" id="queue_details">
        <thead>
         <tr>
           <th>Priority #</th>
           <th>Name</th>          
         </tr>
        </thead>
-       </tbody>
+       <tbody>
        @if ( !empty($queue_pending_details) )
          @foreach ($queue_pending_details as $queue)
             <tr>
@@ -202,9 +206,49 @@ MQUE
         var timeout;
         var alert_prompt = false;
 
-        if( sec_ > 0 ){
-          setInterval( function(){
-              var formData = new FormData();
+        setInterval( function(){
+           //console.log('run');
+          $.ajax({
+            url: '/queue/check',
+            data: {'teller':{{ $session->counter_id }}, '_token': '{{ csrf_token() }}' },
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+              var txt = '';
+              if( data.queue_pending > 0 ){
+                $('#queue_pending').text(data.queue_pending);
+
+                $.each( data.queue_pending_details, function(key, val){
+                   txt += '<tr><td>'+ val.queue_label +'</td><td>'+ val.first_name +' '+ val.last_name +'</td></tr>';
+                });
+                //console.log(txt);
+                $('#queue_details tbody').html('').html(txt);
+              }
+              //console.log(data.queue_pending);
+            }
+          });
+
+        }, 2000 );
+
+
+        function check_queue(){
+          
+          $.ajax({
+            url: '/queue/check',
+            data: {'teller':{{ $session->counter_id }}, '_token': '{{ csrf_token() }}' },
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+              console.log(data);
+            }
+          });
+          
+        }
+
+
+        function next_queue(){
+
+           var formData = new FormData();
               formData.append('current_serve', {{ $current_serve }});
               formData.append('_token', '{{ csrf_token() }}');
 
@@ -218,17 +262,16 @@ MQUE
                   window.location.reload();
                 }
               });
-          }, sec_);
         }
         
 
         function blink(selector){
             $(selector).animate({opacity:0}, 50, "linear", function(){
-                $(this).delay(800);
+                $(this).delay(300);
                 $(this).animate({opacity:1}, 50, function(){
                   blink(this);
                 });
-                $(this).delay(800);
+                $(this).delay(300);
             });
         }
 
@@ -238,7 +281,7 @@ MQUE
              minutes = $('#minutes');
             seconds = $('#seconds');
             // if less than a minute remaining
-            console.log(minutes);
+            //console.log(minutes);
             if (seconds < 59) {
               seconds.html( secs );
             } else {
@@ -248,8 +291,9 @@ MQUE
               seconds.html( sec );
             }
             secs--;
-            if (secs < 0) {
+            if (secs <= 0) {
               clearTimeout(timeout);
+              next_queue();
               return;
             }
             //prompt only once if the time is 30 sec below  
