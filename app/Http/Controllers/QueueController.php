@@ -58,6 +58,35 @@ class QueueController extends Controller
         return $record;
     }
 
+    //called via ajax returns number of queue
+    //same logic as teller controller initialize() but only returns json
+    public function check_queue(){
+
+        $teller = Input::get('teller');
+        //all all how many on queue on that teller
+        $queue_pending = Queue::where('counterID_fk', $teller )
+                        ->where('status', 0)
+                        ->leftJoin('tbl_register_license', 'rl_id', '=', 'transactionID_fk')
+                        ->leftJoin('tbl_client_info', 'tbl_client_info.client_id', '=', 'tbl_register_license.client_id')
+                        ->orderBy('queue_id', 'asc')
+                        ->orderByRaw('FIELD("client_type", "1,2,0")')
+                        ->get();
+                   
+        //do not display the currently serving queue
+        if( count($queue_pending) > 1 && !empty($queue_pending) ){
+          $first = 0; 
+          $first_queue = $queue_pending[$first];      
+          unset( $queue_pending[$first] );
+          //end   
+        }
+        $data_view['queue_pending_details'] = $queue_pending;
+        $queue_pending = count($queue_pending);
+        $data_view['queue_pending'] = $queue_pending;
+
+        return json_encode( $data_view );
+
+    }
+
     private function get_next( $teller ){
 
         $record = Queue::where('counterID_fk', $teller)->orderBy('created_at', 'asc')->get();

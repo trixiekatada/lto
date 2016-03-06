@@ -76,6 +76,9 @@ Route::post('/pages/photo_and_signature', 'QueueController@next_queue');
 Route::post('/pages/cashier', 'QueueController@next_queue');
 Route::post('/pages/releasing', 'QueueController@next_queue');
 
+Route::post('/queue/check', 'QueueController@check_queue');
+Route::get('/queue/check', 'QueueController@check_queue');
+
 //customer routes
 Route::get('/client/index',function(){
 	return view('client.index');
