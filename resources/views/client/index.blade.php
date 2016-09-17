@@ -69,59 +69,83 @@
 		<div class="top-nav">
 			<ul class="right-icons">
 
-                 <li><a href="#"><i class="glyphicon glyphicon-user" value=""></i></a></li>
-				<li><a  href="{{ URL::to('/auth/logout') }}"><i class="glyphicon glyphicon-user"> </i>Logout</a></li>
+                 <li><a href="#"><i class="glyphicon glyphicon-user" value=""></i>{{ $client_info->first_name .' '. $client_info->last_name }}</a></li>
+				<li><a  href="{{ URL::to('/client/logout') }}"><i class="glyphicon glyphicon-user"> </i>Logout</a></li>
 
 			</ul>
-				   
-				
-			
-			
-		
 		</div>	
 </div>
 </div>
 
-
-
 <div class="blog">
 <div class="container">
-	<h2>LTO QUEUE MANAGEMENT SYSTEM</h2>
-	<table style="width:70%;align-text:center">
-		<tr>
-			<td>
-				 <h4>Vision</h4>
-	        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the when an unknown printer took a galley of type and scrambled it to make. a type specimen book. It has survived not only five centuries. but also the leap into electronic typesetting, remaining essentially unchanged. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, </p>
-			</td>
-			<td>
-				 <h4>Mission</h4>
-	        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the when an unknown printer took a galley of type and scrambled it to make. a type specimen book. It has survived not only five centuries. but also the leap into electronic typesetting, remaining essentially unchanged. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, </p>
-			</td>
-		</tr>
-	</table>  
-        <div id="loginbox" style="margin-top:50px;position:absolute;margin-top:-35%;float:right">                    
-            <div class="panel panel-info" >
-                    <div class="panel-heading">
-                        <div class="panel-title">Add Transaction</div>
-                    </div>     
+	<center><h2 style="color:green">* LTO QUEUE MANAGEMENT SYSTEM *</h2></center>
+    <div class="about-head">
+        <div class="container">
+                <div class="about-in">
+                    <img src="/images/photo.jpg" class="thumb" alt="a picture">       
+                    <h6 ><a href="blog_single.html">Lorem ipsum dolor sit amet, consectetur adipisci ngelit. Donec nisi sem, vestibulum Etortor tortor in turpis. Proin mauris nulla, rutrum aliquet arcu vel</a></h6>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nisi sem, vestibulum ac lobortis quis, aliquet in metus. Suspendi sse a nibh id eros consectetur laoreet. Etiam viverra auctor orci, eu mattis ipsum rutrum nec.
+                        Etortor tortor in turpis. Proin mauris nulla, rutrum aliquet arcu vel, porttitor varius dolor. Phasellus vitae tincidunt orci, et faucibus eros. Sed dolor sapien, pharetra placerat feugiat.</p>
+                </div>
+        </div>
+    </div>
+	
+        <div class="container">
+            <h3>Choose Transaction</h3>
+            <div class="us-choose">
+                <div class="col-md-6 why-choose">
+                    <div class="  ser-grid ">
+                        <a href="{{ URL::to('/client/registerLicense') }}"><i class="hi-icon hi-icon-archive glyphicon glyphicon-pencil"> </i></a>
+                    </div>
+                    <div class="ser-top beautiful"> 
+                        <h5>License Registration</h5>
+                        <label>Register a new license</label>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.</p>
+                    </div>
+                    <div class="clearfix"> </div>
+                </div>
+                <div class="col-md-6 why-choose">
+                    <div class=" ser-grid">
+                        <a href="{{ URL::to('/client/registerVehicle') }}"><i class="hi-icon hi-icon-archive glyphicon glyphicon-time"> </i></a>
+                    </div>
+                    <div class="ser-top beautiful"> 
+                        <h5>Vehicle Registration</h5>
+                        <label>Register a new vehicle</label>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.</p>
+                    </div>
+                    <div class="clearfix"> </div>
+                </div>
+                <div class="clearfix"> </div>
+            </div>
+            <div class="us-choose">
+                <div class="col-md-6 why-choose">
+                    <div class=" ser-grid">
+                        <a href="{{ URL::to('/client/renewLicense') }}"><i class="hi-icon hi-icon-archive glyphicon glyphicon-cog"> </i></a>
+                    </div>
+                    <div class="ser-top beautiful"> 
+                        <h5>Renew License</h5>
+                        <label>Renew a registered license</label>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.</p>
+                    </div>
+                    <div class="clearfix"> </div>
+                </div>
+            </div>
+            <div class="col-md-6 why-choose">
+                    <div class=" ser-grid">
+                        <a href="{{ URL::to('/client/renewVehicle') }}"><i class="hi-icon hi-icon-archive glyphicon glyphicon-file"> </i></a>
+                    </div>
+                    <div class="ser-top beautiful"> 
+                        <h5>Renew Vehicle</h5>
+                        <label>Renew a registered Vehicle</label>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.</p>
+                    </div>
+                    <div class="clearfix"> </div>
+                </div>
+            </div>
+        </div>
 
-                    <div style="padding-top:30px" class="panel-body" >
-
-        					 <div style="margin-top:10px" class="form-group">
-                                     <div class="col-sm-12 controls">
-                                      <a id="btn-login" href="{{ URL::to('/client/registerLicense') }}" class="hvr-sweep-to-right">License Registration </a>
-                                    </div>
-                                </div>
-                                <br /><br><br>
-                             <div style="margin-top:10px" class="form-group">
-                                     <div class="col-sm-12 controls">
-                                      <a id="btn-login" href="registerVehicle" class="hvr-sweep-to-right">Vehicle Registration </a>
-                                    </div>
-                            </div>                  
-					</div>
-				</div>
-			</div>
-
+<br><br><br>
 	<div class="footer-bottom">
 		<div class="container">
 				<div class="col-md-4 footer-logo">
@@ -134,6 +158,5 @@
 	 	</div>
 	</div>
 </div>
-<!--//footer-->
 </body>
 </html>

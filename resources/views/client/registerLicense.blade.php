@@ -9,7 +9,7 @@
 @section('content')
 <div class="header">
 	<div class="container">
-		
+		  <title>Register License</title>
 			<div class="logo">
 				<h1><a href="index.html">MQUES</a></h1>
 			</div>
@@ -71,13 +71,13 @@
             <div class="form-group">
                 <label for="first_name" class="col-md-3 control-label">Gender</label>
                 <div class="col-md-9">
-                    {!! Form::select('gender', array('Female' => 'Female', 'Male' => 'Male')); !!}
+                   <input type="text" class="form-control" name="gender" value="{{ $data->gender }}">
             	</div>
         	</div>
         	<div class="form-group">
                 <label for="first_name" class="col-md-3 control-label">Birthdate</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="birthdate" value"">
+                    <input type="text" class="form-control" name="birthdate" value="{{ $data->birthdate }}">
                 </div>
             </div>
             <div class="form-group">
@@ -95,7 +95,7 @@
             <div class="form-group">
                 <label for="first_name" class="col-md-3 control-label">Tel No.</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="telno" placeholder="">
+                    <input type="text" class="form-control" name="mobile" value="{{ $data->mobile }}">
                 </div>
             </div>
             <div class="form-group">

@@ -14,6 +14,7 @@ use Input;
 use App\Queue;
 use App\Counter;
 use Redirect;
+use Response;
 
 class QueueController extends Controller
 {
@@ -23,8 +24,6 @@ class QueueController extends Controller
      * @return \Illuminate\Http\Response
      */
   
-   
-
     public function view_all(){
 
         //get current serve
@@ -33,15 +32,14 @@ class QueueController extends Controller
         $data_view['teller3'] = $this->get_current(3)->queue_label;
         $data_view['teller4'] = $this->get_current(4)->queue_label;
         $data_view['teller5'] = $this->get_current(5)->queue_label;
-        $data_view['teller6'] = $this->get_current(6)->queue_label;
 
         //get next queue
-        $data_view['teller_n1'] = $this->get_next(1)->queue_label;
-        $data_view['teller_n2'] = $this->get_next(2)->queue_label;
-        $data_view['teller_n3'] = $this->get_next(3)->queue_label;
-        $data_view['teller_n4'] = $this->get_next(4)->queue_label;
-        $data_view['teller_n5'] = $this->get_next(5)->queue_label;
-        $data_view['teller_n6'] = $this->get_next(6)->queue_label;
+        // $data_view['teller_n1'] = $this->get_next(1)->queue_label;
+        // $data_view['teller_n2'] = $this->get_next(2)->queue_label;
+        // $data_view['teller_n3'] = $this->get_next(3)->queue_label;
+        // $data_view['teller_n4'] = $this->get_next(4)->queue_label;
+        // $data_view['teller_n5'] = $this->get_next(5)->queue_label;
+
 
         return view('queue.view', $data_view);
     }
@@ -73,7 +71,41 @@ class QueueController extends Controller
                         ->get();
                    
         //do not display the currently serving queue
-        if( count($queue_pending) > 1 && !empty($queue_pending) ){
+        if( count($queue_pending) > 0 && !empty($queue_pending) ){
+          $first = 0; 
+          $first_queue = $queue_pending[$first];      
+          unset( $queue_pending[$first] );
+          //end   
+        }
+        $data_view['queue_pending_details'] = $queue_pending;
+        $queue_pending = count($queue_pending);
+        $data_view['queue_pending'] = $queue_pending;
+
+        return json_encode( $data_view );
+    }
+
+    public function totalServed()
+  {
+    $status = Queue::where('status', '=', 0)->count();
+
+    return Redirect::intended($status);
+    
+  }
+
+    public function check_queue_rv(){
+
+        $teller = Input::get('teller');
+        //all all how many on queue on that teller
+        $queue_pending = Queue::where('counterID_fk', $teller )
+                        ->where('status', 0)
+                        ->leftJoin('tbl_register_vehicle', 'rv_id', '=', 'transactionID_fk')
+                        ->leftJoin('tbl_client_info', 'tbl_client_info.client_id', '=', 'tbl_register_vehicle.client_id')
+                        ->orderBy('queue_id', 'asc')
+                        ->orderByRaw('FIELD("client_type", "1,2,0")')
+                        ->get();
+                   
+        //do not display the currently serving queue
+        if( count($queue_pending) > 0 && !empty($queue_pending) ){
           $first = 0; 
           $first_queue = $queue_pending[$first];      
           unset( $queue_pending[$first] );

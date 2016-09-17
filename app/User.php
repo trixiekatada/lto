@@ -40,4 +40,11 @@ class User extends Model implements AuthenticatableContract,
         return $this->hasOne("App\Counter", "counter_id", "counter_name" );
     }
 
+    public function getRegisterLicense(){
+        return $this->hasMany("App\RegisterLicense","rl_id","rl_id");
+    }
+
+    public function getRegisterVehicle(){
+        return $this->hasMany("App\RegisterVehicle","rv_id","rv_id");
+    }
 }

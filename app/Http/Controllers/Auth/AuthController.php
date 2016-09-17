@@ -22,8 +22,8 @@ class AuthController extends Controller
     */
 
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
-   
-    protected $loginPath = '/auth/login';
+   private $redirectTo = '/home';
+    //protected $loginPath = '/auth/login';
 
     /**
      * Create a new authentication controller instance.
@@ -32,8 +32,9 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest', ['except' => 'getLogout']);
+        $this->middleware('cors', ['except' => 'getLogout']);
     }
+
 
     /**
      * Get a validator for an incoming registration request.
@@ -58,14 +59,16 @@ class AuthController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
+        return Teller::create([
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'gender' => $data['gender'],
             'address' => $data['address'],
             'mobile' => $data['mobile'],
-            'birth' => $data['birthdate'],
-            'gender' => $data['gender'],
+            'birthdate' => $data['birthdate'],
+            'username' => $data['username'],
             'email' => $data['email'],
-            'password' => $data['password'],
+            'password' => bcrypt($data['password']),
         ]);
     }
 }

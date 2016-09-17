@@ -12,6 +12,6 @@ class RegisterLicense extends Model
 
 
      public function getClientInfo(){
-     	return $this->hasMany("App\ClientInfo","client_id" ,"client_id");
+     	return $this->hasOne("App\ClientInfo","client_id" ,"client_id");
      }
 }

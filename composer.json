@@ -11,7 +11,8 @@
         "dompdf/dompdf": "^0.6.1",
         "barryvdh/laravel-dompdf": "^0.6.0",
         "simplesoftwareio/simple-qrcode": "1.3.*",
-        "libern/qr-code-reader": "^1.0"
+        "libern/qr-code-reader": "^1.0",
+        "barryvdh/laravel-cors": "0.7.x"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

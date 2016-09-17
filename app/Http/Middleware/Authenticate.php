@@ -32,6 +32,12 @@ class Authenticate
      * @param  \Closure  $next
      * @return mixed
      */
+
+    public function authorize()
+    {
+        return true;
+    }
+
     public function handle($request, Closure $next)
     {
         if ($this->auth->guest()) {

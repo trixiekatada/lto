@@ -12,8 +12,15 @@ class Queue extends Model
     protected $primaryKey  = 'queue_id';
     protected $fillable = ['transactionID_fk','counterID_fk', 'clientID_fk', 'queue_label'];
 
-    //relation to tbl_transactions
-    public function transactions(){
-    	return $this->has('Transactions', 'transactionID_fk', 'transactions_id');
+    public function getRegisterLicense(){
+        return $this->hasMany("App\RegisterLicense", "rl_id", "rl_id" );
+    }
+
+    public function getRegisterVehicle(){
+        return $this->hasMany("App\RegisterVehicle", "rv_id", "rv_id" );
+    }
+
+    public function getCounter(){
+        return $this->hasMany("App\Counter", "counter_id", "counter_id");
     }
 }

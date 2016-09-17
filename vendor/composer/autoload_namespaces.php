@@ -19,4 +19,5 @@ return array(
     'Diff' => array($vendorDir . '/phpspec/php-diff/lib'),
     'Cron' => array($vendorDir . '/mtdowling/cron-expression/src'),
     'BaconQrCode' => array($vendorDir . '/bacon/bacon-qr-code/src'),
+    'Asm89\\Stack' => array($vendorDir . '/asm89/stack-cors/src'),
 );

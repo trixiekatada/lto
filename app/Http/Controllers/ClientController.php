@@ -22,120 +22,21 @@ use App\Transactions;
 use App\Queue;
 use App\ClientInfo;
 use App\RegisterLicense;
+use App\RegisterVehicle;
+use App\RenewLicense;
+use App\RenewVehicle;
 
 class ClientController extends Controller {
  
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
-  
-  	//protected $loginPath = 'client/login';
-
-    /**
-     * Create a new authentication controller instance.
-     *
-     * @return void
-     */
-	public function __construct(){
-
-	}
-
-
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'transaction_id' => 'required|max:255',
-            'verification_code' => 'required',            
-        ]);
-    }
 
     public function index(){
       
-    	return view('client.login');
+        return view('client.login');
     }
 
-    public function post_login(){
-    	//verify post if transaction is exists
-    	//once login insert into tbl_queue
-
-       $input = Input::all();
-       //check if we have client info
-       $if_client_exists = ClientInfo::where('email', Input::get('email'))->where('password', Hash::make(Input::get('password')) )->get();
-
-       if( count($if_client_exists) > 0 ){
-            $if_record_exist = Transactions::where('transactions_id', Input::get('transactionsID'))->where('verification_code', Input::get('verification_code'))->get();
-
-            //if we have found record then enqueue
-           if ( count($if_record_exist) > 0 ) {
-                //if we have valid transaction then insert in the queue
-
-                //get last queue label inserted
-                //this is for the 350 limit per operation day
-                $last_queue = Queue::orderBy('queue_id', 'ASC')->first();
-                $last_queue_label = $last_queue->queue_label;
-                if( $last_queue_label == 50 /* limit per day  */ ){
-                    //reset to 0 if reached to 350
-                    $new_queue_label = 1;
-                } else {
-                    $new_queue_label = $last_queue_label + 1;
-                }
-
-                $queue = new Queue;
-                $queue->transactionID_fk = Input::get('transactionsID');
-                $queue->processID_fk = 1;
-                $queue->counterID_fk = 1;
-                $queue->queue_label = $new_queue_label;             
-                $queue->save();
-
-                //display the priority number from the last inserted ID
-                $priority_number = $queue->queue_label;
-
-                $data['msg'] = 'Transaction verified <br/> Number: '. $priority_number;
-                return view('client.login', $data);
-            } else {
-                $data['msg'] = 'Transaction unverified, please check your transaction details';
-                return view('client.login', $data);
-            }
-
-
-       }
-
-
-        //get all records from tbl_transactions that will match by the provided information
-       /* $if_record_exist = Transactions::where('transactions_id', Input::get('transactionsID'))->where('verification_code', Input::get('verification_code'))->get();
-
-        //if we have found record then enqueue
-       if ( count($if_record_exist) > 0 ) {
-            //if we have valid transaction then insert in the queue
-
-            //get last queue label inserted
-            //this is for the 350 limit per operation day
-            $last_queue = Queue::orderBy('queue_id', 'ASC')->first();
-            $last_queue_label = $last_queue->queue_label;
-            if( $last_queue_label == 50 /* limit per day   ){
-                //reset to 0 if reached to 350
-                $new_queue_label = 1;
-            } else {
-                $new_queue_label = $last_queue_label + 1;
-            }
-
-            $queue = new Queue;
-            $queue->transactionID_fk = Input::get('transactionsID');
-            $queue->processID_fk = 1;
-            $queue->counterID_fk = 1;
-            $queue->queue_label = $new_queue_label;             
-            $queue->save();
-
-            //display the priority number from the last inserted ID
-            $priority_number = $queue->queue_label;
-
-            $data['msg'] = 'Transaction verified <br/> Number: '. $priority_number;
-            return view('client.login', $data);
-        } else {
-            $data['msg'] = 'Transaction unverified, please check your transaction details';
-            return view('client.login', $data);
-        }
-        */
-
-
+    public function register(){
+        return view('client.register');
     }
 
     //customer side
@@ -146,9 +47,10 @@ class ClientController extends Controller {
 
         //login succeded?
        if( count($login) > 0){
+
             Session::put( 'client_info', $login );
             
-            return view( '/client/index' );
+            return view( '/client/index')->with('client_info',  $login[0] );
         } 
     }
 
@@ -156,24 +58,245 @@ class ClientController extends Controller {
         Session::flush();
         return Redirect::intended('/');
     }
-    
+
+    //views
      public function rl_view()
     {   
-        //get username from session
-        $client_id = Session::get('client_info'); //[0]->client_id;
+        $client_id = Session::get('client_info');
         $client_id = $client_id[0]->client_id;
         $data = ClientInfo::find( $client_id );
         return view('client.registerLicense')->with('data',$data);
     }
 
-    public function register(){
-        return view('client.register');
+    public function renewl_view()
+    {   
+        $client_id = Session::get('client_info');
+        $client_id = $client_id[0]->client_id;
+        $data = ClientInfo::find( $client_id );
+        return view('client.renewLicense')->with('data',$data);
     }
-    //store transaction
-    public function rLicense(Request $request){
 
+ 
+    public function rv_view()
+    {   
+        $client_id = Session::get('client_info');
+        $client_id = $client_id[0]->client_id;
+        $data = ClientInfo::find( $client_id );
+        return view('client.registerVehicle')->with('data',$data);
+    }
+
+      public function renewv_view()
+    {   
+        $client_id = Session::get('client_info');
+        $client_id = $client_id[0]->client_id;
+        $data = ClientInfo::find( $client_id );
+        return view('client.renewVehicle')->with('data',$data);
+    }
+
+    
+    //store vehivle transaction
+    public function rVehicle(Request $request){
         $data = Input::all();
+        $rules = array(
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'address' => 'required|string',
+            'agency' => 'required|string',
+            'fileNumber' => 'required|string',
+            'authAgency' => 'required|string',
+            'agencyName' => 'required|string',
+            'agencyAddress' => 'required|string',
+            'TOR' => 'required',
+            'MVRRNo' => 'required|string',
+            'CHPGNo' => 'required|string',
+            'IENo' => 'required|string',
+            'ie_name' => 'required|string',
+            'ie_address' => 'required|string',
+            'insurer' => 'required|string',
+            'policyNumber' => 'required|string',
+            'kindOfVehicle' => 'required',
+            'expiryDate' => 'required|string',
+            'COCNo' => 'required|string',
+            'ENo' => 'required|string',
+            'dateENo' => 'required|string',
+            'PL' => 'required|string',
+            'TPL' => 'required|string',
+            'classification' => 'required',
+            'brand' => 'required|string',
+            'plateNo' => 'required|string',
+            'typeOfFuel' => 'required',
+            'motorNo' => 'required|string',
+            'serialNo' => 'required|string',
+            'series' => 'required|string',
+            'typeOfBody' => 'required|string',
+            'doorNo' => 'required|string',
+            'yearModel' => 'required|string',
+            );
+        $validation = Validator::make($data, $rules);
+        if($validation->passes()) {
+            $vehicle = new RegisterVehicle;
+            $client_info = Session::get('client_info');
+            $vid = $client_info[0]->client_id;
+            $vehicle->client_id = $vid;
+            $vehicle->transaction_type = 'Vehicle Registration';
+            $vehicle->first_name = $data['first_name'];
+            $vehicle->last_name = $data['last_name'];
+            $vehicle->address = $data['address'];
+            $vehicle->date = $data['date'];
+            $vehicle->agency = $data['agency'];
+            $vehicle->fileNumber = $data['fileNumber'];
+            $vehicle->authAgency = $data['authAgency'];
+            $vehicle->agencyName = $data['agencyName'];
+            $vehicle->agencyAddress = $data['agencyAddress'];
+            $vehicle->TOR = $data['TOR'];
+            $vehicle->MVRRNo = $data['MVRRNo'];
+            $vehicle->CHPGNo = $data['CHPGNo'];
+            $vehicle->IENo = $data['IENo'];
+            $vehicle->ie_name= $data['ie_name'];
+            $vehicle->ie_address = $data['ie_address'];
+            $vehicle->insurer = $data['insurer'];
+            $vehicle->policyNumber = $data['policyNumber'];
+            $vehicle->kindOfVehicle = $data['kindOfVehicle'];
+            $vehicle->expiryDate = $data['expiryDate'];
+            $vehicle->COCNo = $data['COCNo'];
+            $vehicle->ENo = $data['ENo'];
+            $vehicle->dateENo = $data['dateENo'];
+            $vehicle->PL = $data['PL'];
+            $vehicle->TPL = $data['TPL'];
+            $vehicle->classification = $data['classification'];
+            $vehicle->brand = $data['brand'];
+            $vehicle->plateNo = $data['plateNo'];
+            $vehicle->typeOfFuel = $data['typeOfFuel']; 
+            $vehicle->motorNo = $data['motorNo']; 
+            $vehicle->serialNo = $data['serialNo']; 
+            $vehicle->series = $data['series']; 
+            $vehicle->typeOfBody = $data['typeOfBody']; 
+            $vehicle->doorNo = $data['doorNo']; 
+            $vehicle->yearModel = $data['yearModel']; 
+            $vehicle->save();
 
+            $vehicle_inserted_id = $vehicle->rv_id;
+            $vehicle_to_update = RegisterVehicle::find($vehicle_inserted_id);
+             //qr code
+            $qr_code_filename = $vehicle_to_update->rv_id;
+            $qr_code_filename = strtolower($qr_code_filename);
+            $qr_code_filename = $qr_code_filename.'_'.uniqid().'.png';
+            $qr_code_full_filename = base_path().'/images/vqrcode/'.$qr_code_filename;
+            \QrCode::format('png')->size(250)->generate($vehicle_to_update->rv_id, $qr_code_full_filename);
+            $vehicle_to_update->vqrcode = $qr_code_full_filename;
+            $vehicle_to_update->save();
+
+            return Redirect::to('/RVPDF/?rv_id='. $vehicle_inserted_id );
+        }  else 
+               {
+                   exit();
+                   return Redirect::back()->withInput()->withErrors($validation);
+               }
+    }
+
+     public function renewVehicle(Request $request){
+        $data = Input::all();
+        $rules = array(
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'address' => 'required|string',
+            'agency' => 'required|string',
+            'fileNumber' => 'required|string',
+            'authAgency' => 'required|string',
+            'agencyName' => 'required|string',
+            'agencyAddress' => 'required|string',
+            'TOR' => 'required',
+            'MVRRNo' => 'required|string',
+            'CHPGNo' => 'required|string',
+            'IENo' => 'required|string',
+            'ie_name' => 'required|string',
+            'ie_address' => 'required|string',
+            'insurer' => 'required|string',
+            'policyNumber' => 'required|string',
+            'kindOfVehicle' => 'required',
+            'expiryDate' => 'required|string',
+            'COCNo' => 'required|string',
+            'ENo' => 'required|string',
+            'dateENo' => 'required|string',
+            'PL' => 'required|string',
+            'TPL' => 'required|string',
+            'classification' => 'required',
+            'brand' => 'required|string',
+            'plateNo' => 'required|string',
+            'typeOfFuel' => 'required',
+            'motorNo' => 'required|string',
+            'serialNo' => 'required|string',
+            'series' => 'required|string',
+            'typeOfBody' => 'required|string',
+            'doorNo' => 'required|string',
+            'yearModel' => 'required|string',
+            );
+        $validation = Validator::make($data, $rules);
+        if($validation->passes()) {
+            $rvehicle = new RenewVehicle;
+            $client_info = Session::get('client_info');
+            $vid = $client_info[0]->client_id;
+            $rvehicle->client_id = $vid;
+            $rvehicle->transaction_type = 'Vehicle Registration';
+            $rvehicle->first_name = $data['first_name'];
+            $rvehicle->last_name = $data['last_name'];
+            $rvehicle->address = $data['address'];
+            $rvehicle->date = $data['date'];
+            $rvehicle->agency = $data['agency'];
+            $rvehicle->fileNumber = $data['fileNumber'];
+            $rvehicle->authAgency = $data['authAgency'];
+            $rvehicle->agencyName = $data['agencyName'];
+            $rvehicle->agencyAddress = $data['agencyAddress'];
+            $rvehicle->TOR = $data['TOR'];
+            $rvehicle->MVRRNo = $data['MVRRNo'];
+            $rvehicle->CHPGNo = $data['CHPGNo'];
+            $rvehicle->IENo = $data['IENo'];
+            $rvehicle->ie_name= $data['ie_name'];
+            $rvehicle->ie_address = $data['ie_address'];
+            $rvehicle->insurer = $data['insurer'];
+            $rvehicle->policyNumber = $data['policyNumber'];
+            $rvehicle->kindOfVehicle = $data['kindOfVehicle'];
+            $rvehicle->expiryDate = $data['expiryDate'];
+            $rvehicle->COCNo = $data['COCNo'];
+            $rvehicle->ENo = $data['ENo'];
+            $rvehicle->dateENo = $data['dateENo'];
+            $rvehicle->PL = $data['PL'];
+            $rvehicle->TPL = $data['TPL'];
+            $rvehicle->classification = $data['classification'];
+            $rvehicle->brand = $data['brand'];
+            $rvehicle->plateNo = $data['plateNo'];
+            $rvehicle->typeOfFuel = $data['typeOfFuel']; 
+            $rvehicle->motorNo = $data['motorNo']; 
+            $rvehicle->serialNo = $data['serialNo']; 
+            $rvehicle->series = $data['series']; 
+            $rvehicle->typeOfBody = $data['typeOfBody']; 
+            $rvehicle->doorNo = $data['doorNo']; 
+            $rvehicle->yearModel = $data['yearModel']; 
+            $rvehicle->save();
+
+          $vehicle_inserted_id = $rvehicle->renewvehicle_id;
+            $license_to_update = RenewVehicle::find($vehicle_inserted_id);
+             //qr code
+            $qr_code_filename = $license_to_update->renewvehicle_id;
+            $qr_code_filename = strtolower($qr_code_filename);
+            $qr_code_filename = $qr_code_filename.'_'.uniqid().'.png';
+            $qr_code_full_filename = base_path().'/images/rvqrcode/'.$qr_code_filename;
+            \QrCode::format('png')->size(250)->generate($license_to_update->renewvehicle_id, $qr_code_full_filename);
+            $license_to_update->rvqrcode = $qr_code_full_filename;
+            $license_to_update->save();
+
+
+            return Redirect::to('/intorenew/?renewvehicle_id='. $vehicle_inserted_id );
+        }  else 
+               {
+                   exit();
+                   return Redirect::back()->withInput()->withErrors($validation);
+               }
+    }
+
+    //store license transaction
+    public function rLicense(Request $request){
+        $data = Input::all();
         $rules = array(
                 'first_name' => 'required|string',
                 'last_name' => 'required|string',
@@ -183,7 +306,7 @@ class ClientController extends Controller {
                 'birthdate' => 'required|string',
                 'height' => 'required|numeric',
                 'weight' => 'required|numeric',
-                'telno' => 'required|numeric',
+                'mobile' => 'required|numeric',
                 'TOA' => 'required',
                 'TLA' => 'required',
                 'DSA' => 'required',
@@ -199,15 +322,13 @@ class ClientController extends Controller {
                 'fathername' => 'required|string',
                 'mothername' => 'required|string',
         );
-
         $validation = Validator::make($data, $rules);
-        
         if($validation->passes()) {
             $license = new RegisterLicense;
-
             $client_info = Session::get('client_info');
             $id = $client_info[0]->client_id;
             $license->client_id = $id;
+            $license->transaction_type = 'License Registration';
             $license->first_name = $data['first_name'];
             $license->last_name = $data['last_name'];
             $license->address = $data['address'];
@@ -216,7 +337,7 @@ class ClientController extends Controller {
             $license->birthdate = $data['birthdate'];
             $license->height = $data['height'];
             $license->weight = $data['weight'];
-            $license->telno = $data['telno'];
+            $license->mobile = $data['mobile'];
             $license->TOA = $data['TOA'];
             $license->TLA = $data['TLA'];
             $license->DSA = $data['DSA'];
@@ -250,13 +371,92 @@ class ClientController extends Controller {
         else 
        {
            exit();
-           return Redirect::back()
-               ->withErrors($validation)
-               ->with('flash_error', 'Validation Errors!');
+           return Redirect::back()->withInput()->withErrors($validation);
        }
     }
 
-    //convert the form to Pdf
+    
+    public function renLicense(Request $request){
+       $data = Input::all();
+        $rules = array(
+                'first_name' => 'required|string',
+                'last_name' => 'required|string',
+                'address' => 'required|string',
+                'nationality' => 'required|string',
+                'gender' => 'required|string',
+                'birthdate' => 'required|string',
+                'height' => 'required|numeric',
+                'weight' => 'required|numeric',
+                'mobile' => 'required|numeric',
+                'TOA' => 'required',
+                'TLA' => 'required',
+                'DSA' => 'required',
+                'EA' => 'required',
+                'bloodtype' => 'required|string',
+                'donor' => 'required|string',
+                'civilstatus' => 'required',
+                'hair' => 'required',
+                'eyes' => 'required',
+                'built' => 'required',
+                'complexion' => 'required',
+                'birth_place' => 'required|string',
+                'fathername' => 'required|string',
+                'mothername' => 'required|string',
+        );
+        $validation = Validator::make($data, $rules);
+        if($validation->passes()) {
+            $rlicense = new RenewLicense;
+            $client_info = Session::get('client_info');
+            $id = $client_info[0]->client_id;
+            $rlicense->client_id = $id;
+            $rlicense->transaction_type = 'License Renewal';
+            $rlicense->first_name = $data['first_name'];
+            $rlicense->last_name = $data['last_name'];
+            $rlicense->address = $data['address'];
+            $rlicense->nationality = $data['nationality'];
+            $rlicense->gender = $data['gender'];
+            $rlicense->birthdate = $data['birthdate'];
+            $rlicense->height = $data['height'];
+            $rlicense->weight = $data['weight'];
+            $rlicense->mobile = $data['mobile'];
+            $rlicense->TOA = $data['TOA'];
+            $rlicense->TLA = $data['TLA'];
+            $rlicense->DSA = $data['DSA'];
+            $rlicense->EA = $data['EA'];
+            $rlicense->bloodtype = $data['bloodtype'];
+            $rlicense->donor = $data['donor'];
+            $rlicense->civilstatus = $data['civilstatus'];
+            $rlicense->hair = $data['hair'];
+            $rlicense->eyes = $data['eyes'];
+            $rlicense->built = $data['built'];
+            $rlicense->complexion = $data['complexion'];
+            $rlicense->date = $data['date'];
+            $rlicense->birthplace = $data['birth_place'];
+            $rlicense->fathername = $data['fathername'];
+            $rlicense->mothername = $data['mothername']; 
+            $rlicense->save();
+
+            $rlicense_inserted_id = $rlicense->renewlicense_id;
+            $rlicense_to_update = RenewLicense::find($rlicense_inserted_id);
+             //qr code
+            $rqr_code_filename = $rlicense_to_update->renewlicense_id;
+            $rqr_code_filename = strtolower($rqr_code_filename);
+            $rqr_code_filename = $rqr_code_filename.'_'.uniqid().'.png';
+            $rqr_code_full_filename = base_path().'/images/rqrcode/'.$rqr_code_filename;
+            \QrCode::format('png')->size(250)->generate($rlicense_to_update->renewlicense_id, $rqr_code_full_filename);
+            $rlicense_to_update->rqrcode = $rqr_code_full_filename;
+            $rlicense_to_update->save();
+
+            return Redirect::to('/into/?renewlicense_id='. $rlicense_inserted_id );
+        }
+        else 
+       {
+           exit();
+               return Redirect::back()->withInput()->withErrors($validation);
+       }
+    }
+
+//convert the form to Pdf
     public function RLtoPDF(){
         
         //get data to generate from url query string
@@ -268,32 +468,15 @@ class ClientController extends Controller {
         
         $pdf = \App::make('dompdf.wrapper');
         $content = '<style type="text/css">
-                    .form-style-6{
-                        font: 85% Arial, Helvetica, sans-serif;
-                        max-width: 800px;
-                        margin: 5px auto;
-                        padding: 10px;
-                        background: #F7F7F7;    
+                    .form-style-6{font: 85% Arial, Helvetica, sans-serif;max-width: 800px;margin: 5px auto;padding: 10px;background: #F7F7F7;    
                     }
-                    .form-style-6 h1{
-                        background: #43D1AF;
-                        padding: 20px 0;
-                        font-size: 120%;
-                        font-weight: 300;
-                        text-align: center;
-                        color: #fff;
-                        margin: -13px -13px 13px -13px;
+                    .form-style-6 h1{background: black;padding: 20px 0;font-size: 120%;font-weight: 300;text-align: center; color: #fff;margin: -13px -13px 13px -13px;
                     }   
-                    .form-style-6 ul{
-                        padding:0;
-                        margin:0;
-                        list-style:none;
+                    .form-style-6 ul{ padding:0; margin:0;list-style:none;
                     }
                     .form-style-6 ul li{
-                        display: block;
-                        margin-bottom: 10px;
-                        min-height: 35px;
-                        }
+                        display: block;margin-bottom: 10px;min-height: 35px;
+                    }
 
                     </style>
 
@@ -305,73 +488,80 @@ class ClientController extends Controller {
                     <body>
                     
                     <div class="form-style-6">
-                    <h1>License Registration</h1>
+                    <h1>LICENSE REGISTRATION FORM</h1>
                     <ul>
                         <li>Name: '.$full_name.' 
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            &nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         Present Address: '.$data->address.' </li>
 
                         <li>Nationality: '.$data->nationality.'
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         Gender: '.$data->gender.'</li>
                           
 
-                        <li>Birthday: '.$data->birth.'
+                        <li>Birthday: '.$data->birthdate.'
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
                         Height: '.$data->height.'</li>
 
                         <li>Weight: '.$data->weight.' 
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        Tel/Cp No: '.$data->telNo.' </li>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;
+                        Tel/Cp No: '.$data->mobile.' </li>
                         
+                        <br><br><br>
+                        <li>Type of Application(TOA): '.$data->TOA.' </li>
+                        <li>Type of License Applied for(TLA): '.$data->TLA.'</li>
 
-                        <li>Type of Application(TOA): '.$data->TOA.' 
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        Type of License Applied for(TLA): '.$data->TLA.'</li>
-
-                        <li>Driving Skill Acquired or Will be Acquired Thru(DSA): '.$data->DSA.' 
+                        <li>Driving Skill Acquired or Will be Acquired Thru(DSA): '.$data->DSA.' </li>
                            
                         <li>Educational Attainment(EA): '.$data->EA.' </li>
                         
+                        <br><br><br>
+                        <li>Blood Type: '.$data->bloodtype.'
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Organ Donor?: '.$data->donor.'</li>
 
-                        <li>Blood Type: '.$data->bloodType.'
+                        <li>Civil Status: '.$data->civilstatus.' 
+                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        Organ Donor?: '.$data->donorBoolean.'</li>
-
-                        <li>Civil Status: '.$data->civilStatus.' 
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            &nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         Hair: '.$data->hair.' </li>
                         
 
                         <li>Eyes: '.$data->eyes.'
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         Built: '.$data->built.' </li>
 
                         <li>Complexion: '.$data->complexion.' 
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            &nbsp;&nbsp;&nbsp;
-                        Birt Place: '.$data->birthPlace.' </li>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Birth Place: '.$data->birthplace.' </li>
                         
 
-                        <li>Fathers Name: '.$data->fatherName.' 
-                        <li>Mothers Name: '.$data->motherName.' 
-                        <li>Date Filed: '.$data->date.'
+                        <li>Fathers Name: '.$data->fathername.' 
+                        <li>Mothers Name: '.$data->mothername.' 
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <li>Date Filed: '.$data->date.' </li>
                         
-                 <center><h3>Your QR Code:</h3><img src='.$data->qrcode.'>
+                 <li>QR Code:<img src='.$data->qrcode.'></li>
                 </body>
                 </html>';
 
@@ -384,12 +574,163 @@ class ClientController extends Controller {
 
     }
 
-    public function qrcodeToPDF(){
-
+//convert the form to Pdf
+    public function RVtoPDF(){
         
         //get data to generate from url query string
-        $id = Input::get('rl_id');
-        $data = RegisterLicense::find($id);
+        $id = Input::get('rv_id');
+        $data = RegisterVehicle::find($id);
+     
+        $full_name = ucwords($data->first_name.' '.$data->last_name);
+        $file_name = 'Vehicle Registration - '. $full_name .'.pdf' ;
+        
+        $pdf = \App::make('dompdf.wrapper');
+        $content = '<style type="text/css">
+                    .form-style-6{font: 85% Arial, Helvetica, sans-serif;max-width: 800px;margin: 5px auto;padding: 10px;background: #F7F7F7;    
+                    }
+                    .form-style-6 h1{background: black;padding: 20px 0;font-size: 120%;font-weight: 300;text-align: center; color: #fff;margin: -13px -13px 13px -13px;
+                    }   
+                    .form-style-6 ul{ padding:0; margin:0;list-style:none;
+                    }
+                    .form-style-6 ul li{
+                        display: block;margin-bottom: 10px;min-height: 35px;
+                    }
+
+                    </style>
+
+                    <!DOCTYPE html> 
+                    <html>
+                    <head>
+                    <title>MQues</title>
+                    </head>
+                    <body>
+                    
+                    <div class="form-style-6">
+                    <h1>LICENSE REGISTRATION FORM</h1>
+                    <ul>
+                        <li>Name: '.$full_name.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Present Address: '.$data->address.' </li>
+
+                        <li>Agency: '.$data->agency.'
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        File Number: '.$data->fileNumber.'</li>
+                          
+
+                        <li>Auth Agency: '.$data->authAgency.'
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                        Agency Name: '.$data->agencyName.'</li>
+
+                        <li>Agency Address: '.$data->agencyAddress.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;
+                        TOR: '.$data->TOR.' </li>
+
+                        <li>MVRRNo: '.$data->MVRRNo.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;
+                        CHPGNo: '.$data->CHPGNo.' </li>
+
+                        <li>IENo: '.$data->IENo.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;
+                        IE Name: '.$data->ie_name.' </li>
+
+                        <li>IE Address: '.$data->ie_address.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;
+                        Insurer: '.$data->insurer.' </li>
+
+                        <li>Policy Number: '.$data->policyNumber.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;
+                        Kind Of Vehicle: '.$data->kindOfVehicle.' </li>
+                        
+                        <br><br><br>
+                        <li>COC Number: '.$data->COCNo.' </li>
+                        <li>Expiry Date: '.$data->expiryDate.'</li>
+
+                        <li>EN Number: '.$data->ENo.' </li>
+                           
+                        <li>Date E Number: '.$data->dateENo.' </li>
+                        
+                        <br><br><br>
+                        <li>PL: '.$data->PL.'
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        TPL: '.$data->TPL.'</li>
+
+                        <li>Classification: '.$data->classification.' 
+                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Brand: '.$data->brand.' </li>
+                        
+
+                        <li>Plate Number: '.$data->plateNo.'
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Type Of Fuel: '.$data->typeOfFuel.' </li>
+
+                        <li>Motor Number: '.$data->motorNo.' 
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Serial Number: '.$data->serialNo.' </li>
+                        
+
+                        <li>Series Number: '.$data->series.' 
+                        <li>Type Of Body: '.$data->typeOfBody.' 
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <li>Door Number: '.$data->doorNo.' </li>
+                        <li>Year Model: '.$data->yearModel.' </li>
+                        
+                        <li>QR Code:<img src='.$data->vqrcode.'></li>
+                </body>
+                </html>';
+
+        
+        
+
+        $pdf->loadHTML($content);
+        return $pdf->stream( $file_name, array('Attachment' => false));  
+
+
+    }
+
+
+//PDF the scanned qrcode register license
+    public function qrcodeToPDF(){
+        //get data to generate from url query string
+        $asdid = Input::get('rl_id');
+        $data = RegisterLicense::find($asdid);
 
         //get priority number
         //this is for the 350 limit per operation day
@@ -402,94 +743,30 @@ class ClientController extends Controller {
             $priority_number = $last_queue_label + 1;
         }
 
-
         $queue = new Queue;
-        $queue->transactionID_fk = $id;
+        $queue->transactionID_fk = $asdid;
         $queue->processID_fk = 1;
         $queue->counterID_fk = 1;
         $queue->queue_label = $priority_number;             
         $queue->save();
 
         
-     
         $full_name = ucwords($data->first_name.' '.$data->last_name);
         $file_name = 'License Registration - '. $full_name .'.pdf' ;
         
         $pdf = \App::make('dompdf.wrapper');
         $content = '<style type="text/css">
                     .form-style-6{
-                        font: 85% Arial, Helvetica, sans-serif;
-                        max-width: 800px;
-                        margin: 5px auto;
-                        padding: 10px;
-                        background: #F7F7F7;    
+                        font: 85% Arial, Helvetica, sans-serif;max-width: 800px;margin: 5px auto;padding: 10px;background: #F7F7F7;    
                     }
                     .form-style-6 h1{
-                        background: #43D1AF;
-                        padding: 20px 0;
-                        font-size: 120%;
-                        font-weight: 300;
-                        text-align: center;
-                        color: #fff;
-                        margin: -13px -13px 13px -13px;
+                        background: black;padding: 20px 0;font-size: 120%;font-weight: 300;text-align: center;color: #fff;margin: -13px -13px 13px -13px;
                     }   
-                    .form-style-6 ul{
-                        padding:0;
-                        margin:0;
-                        list-style:none;
+                    .form-style-6 ul{padding:0;margin:0;list-style:none;
                     }
                     .form-style-6 ul li{
-                        display: block;
-                        margin-bottom: 10px;
-                        min-height: 35px;
+                        display: block; margin-bottom: 10px;min-height: 35px;
                         }
-                    .alert {
-                          padding: 15px;
-                          margin-bottom: 20px;
-                          border: 1px solid transparent;
-                          border-radius: 4px;
-                        }
-                    .alert-info {
-                          color: #31708f;
-                          background-color: #d9edf7;
-                          border-color: #bce8f1;
-                        }
-                    .btn-primary {
-                          color: #fff;
-                          background-color: #337ab7;
-                          border-color: #2e6da4;
-                        }
-                    .btn {
-                          display: inline-block;
-                          padding: 6px 12px;
-                          margin-bottom: 0;
-                          font-size: 14px;
-                          font-weight: normal;
-                          line-height: 1.42857143;
-                          text-align: center;
-                          white-space: nowrap;
-                          vertical-align: middle;
-                          -ms-touch-action: manipulation;
-                              touch-action: manipulation;
-                          cursor: pointer;
-                          -webkit-user-select: none;
-                             -moz-user-select: none;
-                              -ms-user-select: none;
-                                  user-select: none;
-                          background-image: none;
-                          border: 1px solid transparent;
-                          border-radius: 4px;
-                        }
-                        .btn-xs,
-                            .btn-group-xs > .btn {
-                              padding: 1px 5px;
-                              font-size: 12px;
-                              line-height: 1.5;
-                              border-radius: 3px;
-                            }
-                        .pull-right {
-                              float: right !important;
-                            }
                     </style>
 
                     <!DOCTYPE html> 
@@ -519,6 +796,78 @@ class ClientController extends Controller {
         return $pdf->stream( $file_name, array('Attachment' => false));  
     }
 
+//PDF the scanned qrcode register vehicle
+    public function vqrcodeToPDF(){
+        //get data to generate from url query string
+        $rv_id = Input::get('rv_id');
+        $data = RegisterVehicle::find($rv_id);
+
+        //get priority number
+        //this is for the 350 limit per operation day
+        $last_queue = Queue::orderBy('queue_label', 'DESC')->orderBy('created_at', 'DESC')->first();
+        $last_queue_label = $last_queue->queue_label;
+        if( $last_queue_label == 50 /* limit per day  */ ){
+            //reset to 0 if reached to 350
+            $priority_number = 1;
+        } else {
+            $priority_number = $last_queue_label + 1;
+        }
+
+        $queue = new Queue;
+        $queue->transactionID_fk = $rv_id;
+        $queue->processID_fk = 1;
+        $queue->counterID_fk = 1;
+        $queue->queue_label = $priority_number;             
+        $queue->save();
+
+        
+        $full_name = ucwords($data->first_name.' '.$data->last_name);
+        $file_name = 'Vehicle Registration - '. $full_name .'.pdf' ;
+        
+        $pdf = \App::make('dompdf.wrapper');
+        $content = '<style type="text/css">
+                    .form-style-6{
+                        font: 85% Arial, Helvetica, sans-serif;max-width: 800px;margin: 5px auto;padding: 10px;background: #F7F7F7;    
+                    }
+                    .form-style-6 h1{
+                        background: black;padding: 20px 0;font-size: 120%;font-weight: 300;text-align: center;color: #fff;margin: -13px -13px 13px -13px;
+                    }   
+                    .form-style-6 ul{padding:0;margin:0;list-style:none;
+                    }
+                    .form-style-6 ul li{
+                        display: block; margin-bottom: 10px;min-height: 35px;
+                        }
+                    </style>
+
+                    <!DOCTYPE html> 
+                    <html>
+                    <head>
+                    <title>MQues</title>
+                    </head>
+                    <body>
+                    
+                    <div class="form-style-6">
+                    <h1>Vehicle Registration</h1>
+                    <ul>
+                        <li>Transaction type: Vehicle Registration</li>
+                        <li>Name: '. $full_name.'</li>
+                        <li>Priority Number: '.$priority_number.'<li>
+                    </ul>
+                    </div>
+                    <center>
+                    <button>
+                        Print
+                    </button>
+                    
+                </body>
+                </html>';
+
+        $pdf->loadHTML($content);
+        return $pdf->stream( $file_name, array('Attachment' => false));  
+    }
+
+
+
     //insert client information
     public function store(Request $request){
 
@@ -529,7 +878,7 @@ class ClientController extends Controller {
             'last_name'=> 'required|string',
             'first_name' => 'required|string',
             'gender'=> 'required|string',
-            'birth'=> 'required|string',
+            'birthdate'=> 'required|string',
             'address'=> 'required',
             'mobile'=> 'required|numeric',
             'email' => 'required|email',
@@ -543,8 +892,7 @@ class ClientController extends Controller {
             'first_name.string'=> 'Letters only',
             'gender.required'=> 'Should not be empty',
             'gender.string'  => 'Letters only',
-            'birth.required'=> 'Should not be empty',
-            'birth.date' => 'Date only',
+            'birthdate.required'=> 'Should not be empty',
             'address.required' => 'Should not be empty',
             'mobile.required' => 'Should not be empty',
             'email.required' => 'Should not be empty',
@@ -559,7 +907,7 @@ class ClientController extends Controller {
             $client->first_name= $data['first_name'];
             $client->last_name= $data['last_name'];
             $client->gender= $data['gender'];
-            $client->birth= $data['birth'];
+            $client->birthdate= $data['birthdate'];
             $client->address = $data['address'];
             $client->mobile  = $data['mobile'];
             $client->email = $data['email'];
@@ -568,31 +916,7 @@ class ClientController extends Controller {
             $client->confirmpassword = $data['confirmPassword'];
             $client->save();
 
-            //generated verification code and transaction id
-            //$client_inserted_id = $client->client_id;
-
-            //insert first to get the transaction_id inserted then use it to the qr_code
-            // $transaction = new Transactions;
-            // $transaction->clientID_fk = $client_inserted_id;
-            // $transaction->transaction_type = Input::get('transaction_type');
-            // //any code as long as it it unique
-            // $transaction->verification_code = rand(10000, 100000);
-            // $transaction->save();
-
-            // $transaction_inserted_id = $transaction->transactions_id;
-            // $transaction_to_update = Transactions::find($transaction_inserted_id);
-
-            //qr code
-            // $qr_code_filename = $transaction_to_update->transactions_id;
-            // $qr_code_filename = strtolower($qr_code_filename);
-            // $qr_code_filename = $qr_code_filename.'_'.uniqid().'.png';
-            // $qr_code_full_filename = base_path().'/images/qrcode/'.$qr_code_filename;
-            // \QrCode::format('png')->size(250)->generate($transaction_to_update->transactions_id, $qr_code_full_filename);
-            // $transaction_to_update->qrcode_url = $qr_code_full_filename;
-            // $transaction_to_update->save();
-
-            // $data['msg'] = 'Registration Complete <br/> Transaction #: '. $transaction_inserted_id . '<br/> Verification code: '. $transaction->verification_code ;
-            return Redirect::to('/client/login');
+          return Redirect::to('/client/login');
        } 
        else {
             return Redirect::back()->withInput()->withErrors($validation);

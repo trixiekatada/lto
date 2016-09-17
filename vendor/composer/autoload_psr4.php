@@ -36,5 +36,6 @@ return array(
     'ClassPreloader\\' => array($vendorDir . '/classpreloader/classpreloader/src'),
     'Carbon\\' => array($vendorDir . '/nesbot/carbon/src/Carbon'),
     'Barryvdh\\DomPDF\\' => array($vendorDir . '/barryvdh/laravel-dompdf/src'),
+    'Barryvdh\\Cors\\' => array($vendorDir . '/barryvdh/laravel-cors/src'),
     'App\\' => array($baseDir . '/app'),
 );

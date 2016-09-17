@@ -74,13 +74,14 @@
         $('form').submit();
       }
     });
+
     setInterval( function(){
       $('.msg').fadeOut(1000);
-    }, 5000 );
+    }, 2000 );
 
     $('#reader').html5_qrcode(function(data){
       $('#read').html(data);
-      window.location = 'http://localhost:8000/qrcode/?rl_id=' + data;
+      window.location = 'http://localhost:8000/qrcode/';
     },
     function(error){
       $('#read_error').html(error);
@@ -88,11 +89,6 @@
       $('#vid_error').html(videoError);
     }
   );
-
- 
-
-
-    
   });
 </script>
 

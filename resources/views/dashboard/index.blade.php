@@ -1,15 +1,10 @@
 @extends('layouts.login')
 
-
 @section('title')
 MQUE
 @stop
-
-
-
-
 @section('content')
-<title>MQUE Dashboard</title>
+
 <style type="text/css">
 
     ul li{
@@ -17,8 +12,6 @@ MQUE
         position: relative;
         line-height: 21px;
         text-align: left;
-        margin-right: 10px;     
-        color: #000;
     }
     ul li:after{
       content: ' | ';
@@ -27,10 +20,10 @@ MQUE
       color: #000;
     }
     .status{
-      display: block;
-      float: left;
-      position: relative;
-      width: 33%;
+      position: absolute;
+      margin-left: 800px;
+      margin-top: 300px;
+      width: 100%;
     }
     .status p { font-size: 20px; }
     .red { color: #f00; }
@@ -59,7 +52,6 @@ MQUE
     .alert_label{ color: #f00; }
 </style>
 
-
 <body>
 <div class="header">
     <div class="container">
@@ -67,81 +59,80 @@ MQUE
             <h1><a href="#">MQUES</a></h1>
         </div>
     
-      <div class="top-nav">
-          <ul>
-              <li><a href="#">Home</a></li>
+    <div class="top-nav">
+        <ul>
+           <li><a href="#">Home</a></li>
               <li><a href="#">About Us</a></li>
               <li><a href="#"><i class="glyphicon glyphicon-user"></i>{{ $session['firstname'] }}</a></li>
               <li><a href="{{ URL::to('/teller/logout/?s='.$counter_label_) }}">Logout</a></li>
-          </ul>
-      </div>
+        </ul>
+    </div>
     </div>
 </div>
 <div class="container">
-  
-  <div class="pre-topp">
-    <h5>{{ $counter_label }} Counter</h5>
-    <p>It may change by the teller. Suspend queue manually.</p>
-  </div>
+    <br>
+        <div class="premiumm">
+            <div class="pre-topp">
+            <h5>{{ $counter_label }} Counter</h5>
+            <p>.......................................................................................................</p>
+            </div>
+        </div>
+        <br><br><br>
+         
+<br><br><br>
+<ul align="left">
+<div class="pending" color="black">
 
-  <div class="row div-status">
+    <h3 >Total Pending Queue:</h3>
+    @if( $queue_pending > 0 )
+        <h2><a href="#" data-toggle="modal" data-target="#queue_modal" id="queue_pending" style="color:black">{{ $queue_pending }}</a></h2>
+      @else
+        <h2><a href="#" data-toggle="modal" data-target="#queue_modal" id="queue_pending" >{{ $queue_pending }}</a></h2>
+      @endif
+</div>
+  
+<div class="duration">
+    <h3>Duration time of teller: </h3>
     <div class="div-timer">
       <span class="alert_label timer">Alert!</span>
         <span id="minutes" class="timer">00</span> : <span id="seconds" class="timer">00</span>
     </div>
-
-    <h1>Teller {{ $session->counter_id }}</h1>
-    <div class="status">
-      <p><label class="red">Currently serving #:</label>
-      <span class="red">{{ $current_serve_label }}</span></p>
-    </div>
-    <div class="status">
-      <p><label>Total Pending Queue:</label> 
-      @if( $queue_pending > 0 )
-        <a href="#" data-toggle="modal" data-target="#queue_modal" id="queue_pending" >{{ $queue_pending }}</a></p>
-      @else
-        <a href="#" data-toggle="modal" data-target="#queue_modal" id="queue_pending" >{{ $queue_pending }}</a></p>
-      @endif
-    </div>
+</div>
 
     <div class="status">
-    
     @if ( $queue_pending > 0 AND $start === true ) 
-    
-<<<<<<< HEAD
-      <p><form method="post" action=""><input type="hidden" name="_token" id="token" value="{{csrf_token()}}"><input type="hidden" name="current_serve" value="{{ $current_serve }}" /><button type="submit" class="btn btn-primary">Next Queue</button></form></p>
-=======
       <p><form method="post" action=""><input type="hidden" name="_token" id="token" value="{{ csrf_token() }}"><input type="hidden" name="current_serve" value="{{ $current_serve }}" /><button type="submit" class="btn btn-primary">Next Queue</button></form></p>
->>>>>>> 62a45adb836f96b926d848cb4fba45ce42ab7147
     @endif
-   
     @if( isset($start) AND $start === false )
       <p><form method="post" action=""><input type="hidden" name="_token" id="token" value="{{ csrf_token() }}"><input type="hidden" value="true" name="start"/> <button type="submit" class="btn btn-primary">Start</button></form></p>
     @endif
-    
-
     </div>
-  </div>
-  <hr/>
-  <div class="container info">
-  @if( isset($client_info) ) 
-  {{-- Display all client information here --}}  
 
-    <h2>Client Information</h2>
-    <table class="table table-striped">
-      <tr> 
-        <td>Transaction type:</td>
-        <td>License Registration</td>
-      </tr>
-      <tr> 
-        <td>Name:</td>
-        <td>{{ $client_info->first_name }} {{ $client_info->last_name }}</td>
-      </tr>
-    </table>
-   @endif 
+<li>
+<div class="project-fur" color="black">
+<div align="center"><br><br>
+    <h2>Teller {{ $session->counter_id }}</h2>
+</div>
+<div class="fur">
+<div class="fur1"><br>
+    <h2 class="red">Currently serving # : </h2><br><br><br>
+     <h1><center><span class="red">{{ $current_serve_label }}</span></center></h1>
+<br><br><br><br>
+<div align="center">
+<h1>
+   
+</h1></div>
+ @if( isset($client_info) ) 
+<span>Customer's Information</span><br>
+<span>Customer Name: {{ $client_info->first_name }} {{ $client_info->last_name }}</span><br>
+<span>Transaction: Register License  </span><br>
+<span>Date Of Registration: {{$client_info->created_at }}</span>
+ @endif 
+</div>
+</div>     
+</div></li>
 
-
-  </div>
+</ul>
 <!--  queueu modal  -->
 <!-- Modal -->
 <div class="modal fade" id="queue_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -151,6 +142,7 @@ MQUE
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel">Current on Queue</h4>
       </div>
+      
       <div class="modal-body">
        <table class="table table-striped" id="queue_details">
        <thead>
@@ -180,7 +172,13 @@ MQUE
 </div>
 <!-- end of queue modal -->
 
-	<div class="footer">
+<br><br>
+       
+    </div>
+</div>
+<br><br><br><br><br>
+<br>
+	<div class="footer-bottom">
 		<div class="container">
 			<div class="col-md-4 footer-logo">
 				<h2><a href="index.html">MQUES</a></h2>
@@ -193,7 +191,7 @@ MQUE
 	</div>
 
 <script type="text/javascript">
-    $(function(){
+    $(document).ready(function(){
 
         blink('.alert_label');
         $('.alert_label').hide();
@@ -230,7 +228,20 @@ MQUE
 
         }, 2000 );
 
+         $('#subscribe').click(function(e){
+         e.preventDefault(); // this prevents the form from submitting
+            $.ajax({
+              url: '/dashboard/index',
+              type: "post",
+              data: {'minutes':$('input[name=minutes]').val(), 'seconds':$('input[name=seconds]').val(),'_token': $('input[name=_token]').val()},
+              dataType: 'JSON',
+              success: function (data) {
+                console.log(data); // this is good
+              }
+            });
+          });
 
+       
         function check_queue(){
           
           $.ajax({
@@ -253,7 +264,7 @@ MQUE
               formData.append('_token', '{{ csrf_token() }}');
 
               $.ajax({
-                url: '/pages/{{ $counter_label_ }}',
+                url: '/pages/{{ str_replace(' ','_', $counter_label_) }}',
                 data: formData,
                 processData: false,
                 contentType: false,
@@ -282,7 +293,7 @@ MQUE
             seconds = $('#seconds');
             // if less than a minute remaining
             //console.log(minutes);
-            if (seconds < 59) {
+            if (seconds < 0) {
               seconds.html( secs );
             } else {
               min = getminutes();
@@ -290,17 +301,32 @@ MQUE
               minutes.html( min );
               seconds.html( sec );
             }
-            secs--;
+            secs++;
+            console.log(secs);
             if (secs <= 0) {
               clearTimeout(timeout);
               next_queue();
               return;
             }
             //prompt only once if the time is 30 sec below  
-            if( secs < 30 && alert_prompt == false){
-              //alert('Time is about to run out.');
-              $('.alert_label').show();
-              alert_prompt = true;
+            if( secs == 120 && alert_prompt == false){
+              var answer = confirm('Your time to serve this client is up. do you want to continue?');
+                  if (answer)
+                  {
+                    console.log('yes');
+                      //alert('Time is about to run out.');
+                    $('.alert_label').show();
+                    alert_prompt = true;
+                  }
+                  else
+                  {
+                    console.log('no');
+                    clearTimeout(timeout);
+                    next_queue();
+                     $('.alert_label').show();
+                    alert_prompt = true;
+                    return;
+                  }
             }
             countdown();
 
@@ -320,6 +346,8 @@ MQUE
         }
         {!! ( $current_serve > 0 ) ? 'countdown();':'' !!}
 });
+
+
     </script>
 </body>
 @stop

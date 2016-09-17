@@ -82,11 +82,11 @@
             <label>Address</label>
             <input type="text" name="address" class="span3" required="" >
             <label>Birthdate : </label>
-            <input type="text" name="birth"   placeholder="Birthdate" required="" >
+            <input type="text" name="birthdate"   Pleaseceholder="Birthdate" required="" >
             <label>Mobile # : </label>
             <input type="text" name="mobile"   placeholder="Mobile Number" required="" >
             <label>Gender : </label>
-            <input type="text" name="gender"  placeholder="Gender" required="" >
+            {!! Form::select('gender', array('Female' => 'Female', 'Male' => 'Male')); !!}
             <label>Email : </label>
             <input type="text" name="email"  value="{{ old('email') }}" placeholder="Email" required="" >
             <label>Username</label>

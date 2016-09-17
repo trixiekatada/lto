@@ -1546,6 +1546,7 @@ figure.effect-layla h4.effect3{
 .pending {
 	position: absolute;
 	margin-left: 600px;
+	color: black;
 }
 
 .total {
@@ -1560,9 +1561,22 @@ figure.effect-layla h4.effect3{
 }
 
 .project-fur{
-	border: 1px solid #CACACA;
+	border: 1px solid black;
 	margin: 0 30px;
+	color: black;
 }
+.project-fur1 {
+	border: 1px solid black;
+	margin: 0 30px;
+	color: black;
+}
+.project-fur1 {
+  margin: 100%;
+}
+.project-fur1 {
+  margin: 0 50px;
+}
+
 .fur{
 	width: 500px;
 	height: 400px;
@@ -1570,13 +1584,13 @@ figure.effect-layla h4.effect3{
 .fur1{
 	padding: 0 1.5em 1em;
 }
-.fur1 span{
+/*.fur1 span{
 	font-size: 0.8em;
 	color:#000;
 	display: block;
 	line-height: 1.5em;
 	padding: 0.2em 0;
-}
+}*/
 span.fur-money{
 	color:#000;
 }

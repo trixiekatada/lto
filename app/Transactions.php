@@ -11,6 +11,6 @@ class Transactions extends Model
     protected $primaryKey  = 'transactions_id';
 
     public function client(){
-    	return $this->has('ClientInfo', 'clientID_fk', 'client_id');
+    	return $this->hasMany('ClientInfo', 'clientID_fk', 'client_id');
     }
 }
