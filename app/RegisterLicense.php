@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RegisterLicense extends Model
 {
-    protected $primaryKey = "rl_id";
+    protected $primaryKey = "id";
      protected $table = 'tbl_register_license';
      public    $timestamps = false;
 

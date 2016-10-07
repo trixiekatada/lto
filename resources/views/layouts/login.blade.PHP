@@ -15,7 +15,6 @@
         {!!HTML:: style('css/default.css')!!}
        
         {!!HTML:: style('css/style.css')!!}
-        {!!HTML:: style('css/styles.css')!!}
     
          {!!HTML:: script('js/jquery.min.js') !!}
       

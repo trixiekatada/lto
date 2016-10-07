@@ -10,17 +10,14 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-        {!!HTML:: style('css/style1.css')!!}
-    
-       {!!HTML:: style('css/bootstrap.css')!!}
+      {!!HTML:: style('css/bootstrap.css')!!}
         {!!HTML:: style('css/default.css')!!}
-        {!!HTML:: style('css/styles.css')!!}
-
-           {!!HTML:: script('js/jquery.min.js') !!}
+       
+        {!!HTML:: style('css/style.css')!!}
+    
+          {!!HTML:: script('js/jquery.min.js') !!}
       
        {!!HTML:: script('js/bootstrap.min.js') !!}
-       
-       
   @yield('content')
 
 

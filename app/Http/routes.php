@@ -17,7 +17,9 @@ Route::post('/home',[ 'middleware' => 'cors', 'uses' => 'MobileController@checku
 Route::get('/getqrcode', [ 'middleware' => 'cors', 'uses' =>'MobileController@getqrcode']);
 Route::get('/getprioritynumber', [ 'middleware' => 'cors', 'uses' =>'MobileController@getprioritynumber']);
 Route::get('/getServing', ['middleware' => 'cors', 'uses' =>'MobileController@getServing']); 
-Route::get('/waitingTime', [ 'middleware' => 'cors', 'uses' =>'MobileController@waitingTime']);
+Route::get('/waitTime', [ 'middleware' => 'cors', 'uses' =>'MobileController@count']);
+Route::get('/setTime', [ 'middleware' => 'cors', 'uses' =>'MobileController@setTime']);
+Route::get('/getTime', [ 'middleware' => 'cors', 'uses' =>'MobileController@getTime']);
 //////////////////////////////////
 
 
@@ -63,6 +65,11 @@ Route::post('/dashboard', 'QueueController@next_queue');
 
 Route::get('/client/transaction/',function(){
 	return view('client.transaction');
+});
+
+//pages teller
+Route::get('pages/t1_registration',function(){
+	return view('teller.t1_registration');	
 });
 
 
@@ -123,6 +130,5 @@ Route::get('/intorenew/', 'ClientController@renvehicle');
 
 //priority number
 Route::get('/qrcode/', 'ClientController@qrcodeToPDF');
-Route::get('/qrcode/', 'ClientController@vqrcodeToPDF');
-
+Route::get('/qrcode/','ClientController@vqrcodeToPDF');
 

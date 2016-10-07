@@ -55,7 +55,7 @@ return [
         'mysql' => [
             'driver'    => 'mysql',
             'host'      => 'localhost',
-            'database'  => 'updateteller',
+            'database'  => 'teller',
             'username'  => 'root',
             'password'  => '',
             'charset'   => 'utf8',

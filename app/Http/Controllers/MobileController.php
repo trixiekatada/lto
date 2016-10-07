@@ -101,19 +101,49 @@ class MobileController extends Controller
     $user_id = Input::get('client_id');
 
     // $count = Steptwo_photosig::where('priorityID', '<=', $priorityID)->get()->count();
-    $count = DB::SELECT(DB::RAW("SELECT count(*) as count FROM stepone_evaluation WHERE  priorityID <= (SELECT priorityID FROM stepone_evaluation WHERE user_id = client_id) ORDER BY priorityID ASC"));
+    $count = DB::SELECT(DB::RAW("SELECT count(*) as count FROM tbl_queues WHERE queue_label <= (SELECT queue_label FROM tbl_queues WHERE transactionID_fk = client_id) ORDER BY queue_label ASC"));
 
     return Response::json($count[0]->count);
    }
 
-   public function waitingTime(){
+   public function getTime(){
+    $time_alloc = Queue::where('status', '=', 0)->lists('time_alloted');
+    // dd($time_alloc);
+    $secondsSum = 0;
+    $minutesSum = 0;
+    for ($i=0; $i < count($time_alloc) ; $i++) { 
+      $divide = explode(":", $time_alloc[$i]);
+      
+      $minutesSum += $divide[0];
+      $secondsSum += $divide[1];
+    }
+      $totalSecond = ($secondsSum*(count($time_alloc)));
 
-    $count = Queue::where('time_alloted', '<=', $client_info)->get()->count();
-
-    return Response::json($count);
-   }
+    return Response::json($totalSecond);
+  }
 
 
+    public function count() {
+        //$transaction = Transaction::where('clientID_fk','=',$session['client_info']->client_id)->first();
+
+        //$que = Queue::where('counterID_fk','=',$transaction->transactions_id)->first();
+
+        //$queue_in_teller = Queue::where('counterID_fk','=',$queue->counterID_fk)->where('active','=',0)->get();
+
+          $queue_pending = Queue::where('counterID_fk',2)
+                        ->where('status', 0)
+                        ->orderBy('queue_id', 'asc')
+                        ->leftJoin('tbl_register_license', 'rl_id', '=', 'transactionID_fk')
+                        ->leftJoin('tbl_client_info', 'tbl_client_info.client_id', '=', 'tbl_register_license.client_id')
+                        ->lists('counterID_fk');
+                      
+
+        $data_view['queue_pending_details'] = $queue_pending;
+        $queue_pending = count($queue_pending);
+        $data_view['queue_pending'] = $queue_pending;
+
+        return Response::json( $data_view );
+    }
 
     /**
      * Show the form for creating a new resource.

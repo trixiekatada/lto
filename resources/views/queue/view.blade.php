@@ -3,7 +3,7 @@
 
 
 @section('content')
-<title>Login</title>
+<title>LTO</title>
 <style type="text/css">
     ul li{
         display: inline-block;
@@ -45,33 +45,13 @@ $(function(){
 
 });
 </script>
-        <div class="containerz">
-            <div class="box">
-                <div class="box2"> 
-                   <div class="header">
+        
+<div class="header">
   <div class="container">
       <div class="logo">
         <h1><a href="index.html">LTO QUEUE MANAGEMENT SYSTEM</a></h1>
       </div>
-    <div class="top-nav">
-      <ul class="right-icons">
-        <li><a href="{{ URL::to('/') }}"><i class="glyphicon glyphicon-user"></i>Home page</a></li>
-        
-      </ul>
-
-    <div class="clearfix"> </div>
-  
-         
-        <link href="css/popuo-box.css" rel="stylesheet" type="text/css" media="all"/>
-        <script src="js/jquery.magnific-popup.js" type="text/javascript"></script>
-
-        <div id="small-dialog" class="mfp-hide">
-          
-        </div>
-       
-  
-    </div>
-    <div class="clearfix"> </div>
+    
     </div>  
 </div>
 
@@ -79,67 +59,70 @@ $(function(){
   <div class="container">
 
     <h3>View All Current Serving</h3>
- <div class="container">
-  <div class="future">  
-      <div >
+
         <ul align="center">     
-          <li><div class="project-fur">
+          <li><div class="view_project-fur">
               <center><h2 style="color:black">Teller 1</h2></center>
-            <div class="fur">
+            <div class="view_fur">
               <div class="fur1">
                 <h6 class="fur-name">Now Serving : </h6>
                 <h1 style="color:black;" align="center" size="1000px" class="current">{{ $teller1 }}</h1>
               </div><br><br>
               <div class="fur2">
                 <span>EVALUATION</span>
+                <h2>{{ $teller_n1 }}</h2>
               </div>
             </div>          
           </div></li>
-            <li><div class="project-fur">
+            <li><div class="view_project-fur">
               <center><h2 style="color:black">Teller 2</h2></center>
-            <div class="fur">
+            <div class="view_fur">
               <div class="fur1">
                 <h6 class="fur-name">Now Serving : </h6>
                 <h1 style="color:black;" align="center" size="1000px" class="current">{{ $teller2 }}</h1>
               </div><br><br>
               <div class="fur2">
                 <span>PHOTO AND SIGNATURE</span>
+                <h2>{{ $teller_n2 }}</h2>
               </div>
             </div>          
           </div></li>
-            <li><div class="project-fur">
+            <li><div class="view_project-fur">
               <center><h2 style="color:black">Teller 3</h2></center>
-            <div class="fur">
+            <div class="view_fur">
               <div class="fur1">
                 <h6 class="fur-name">Now Serving : </h6>
                 <h1 style="color:black;" align="center" size="1000px" class="current">{{ $teller3 }}</h1>
               </div><br><br>
               <div class="fur2">
                 <span>APPROVING</span>
+                <h2>{{ $teller_n3 }}</h2>
               </div>
             </div>          
           </div></li>
-            <li><div class="project-fur">
+            <li><div class="view_project-fur">
               <center><h2 style="color:black">Teller 4</h2></center>
-            <div class="fur">
+            <div class="view_fur">
               <div class="fur1">
                 <h6 class="fur-name">Now Serving : </h6>
                 <h1 style="color:black;" align="center" size="1000px" class="current">{{ $teller4 }}</h1>
               </div><br><br>
               <div class="fur2">
                 <span>CASHIER</span>
+                <h2>{{ $teller_n4 }}</h2>
               </div>
             </div>          
           </div></li>
-           <li><div class="project-fur">
+           <li><div class="view_project-fur">
               <center><h2 style="color:black">Teller 5</h2></center>
-            <div class="fur">
+            <div class="view_fur">
               <div class="fur1">
                 <h6 class="fur-name">Now Serving : </h6>
                 <h1 style="color:black;" align="center" size="1000px" class="current">{{ $teller5 }}</h1>
               </div><br><br>
               <div class="fur2">
                 <span>RELEASING</span>
+                <h2>{{ $teller_n5 }}</h2>
               </div>
             </div>          
           </div></li>
@@ -147,16 +130,8 @@ $(function(){
     </div>
     <br>
     <br>
-    <div class="project-fur"></div>               
+              
     </div>
-  </div>
-</div>
-</div>
-</div> 
-  </div>
-                </div>   
-            </div>
-           
-        </div>
+  
 
 @stop 

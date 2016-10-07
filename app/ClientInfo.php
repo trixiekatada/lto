@@ -16,10 +16,10 @@ class ClientInfo extends Model
     }
 
     public function getRegisterLicense(){
-    	return $this->hasMany("App\RegisterLicense","rl_id","rl_id");
+    	return $this->hasMany("App\RegisterLicense","id","id");
     }
 
     public function getRegisterVehicle(){
-    	return $this->hasMany("App\RegisterVehicle","rv_id","rv_id");
+    	return $this->hasMany("App\RegisterVehicle","id","id");
     }
 }

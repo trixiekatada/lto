@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RenewLicense extends Model
 {
-    protected $primaryKey = "renewlicense_id";
+    protected $primaryKey = "id";
      protected $table = 'tbl_renew_license';
      public    $timestamps = false;
 

@@ -86,7 +86,7 @@
             <label>Mobile # : </label>
             <input type="text" name="mobile"   placeholder="Mobile Number" required="" >
             <label>Gender : </label>
-            {!! Form::select('gender', array('Female' => 'Female', 'Male' => 'Male')); !!}
+            {!! Form::select('gender', array('Female' => 'Female', 'Male' => 'Male')); !!}<br>
             <label>Email : </label>
             <input type="text" name="email"  value="{{ old('email') }}" placeholder="Email" required="" >
             <label>Username</label>

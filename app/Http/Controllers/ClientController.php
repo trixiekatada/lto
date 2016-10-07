@@ -175,18 +175,18 @@ class ClientController extends Controller {
             $vehicle->yearModel = $data['yearModel']; 
             $vehicle->save();
 
-            $vehicle_inserted_id = $vehicle->rv_id;
+            $vehicle_inserted_id = $vehicle->id;
             $vehicle_to_update = RegisterVehicle::find($vehicle_inserted_id);
              //qr code
-            $qr_code_filename = $vehicle_to_update->rv_id;
+            $qr_code_filename = $vehicle_to_update->id;
             $qr_code_filename = strtolower($qr_code_filename);
             $qr_code_filename = $qr_code_filename.'_'.uniqid().'.png';
             $qr_code_full_filename = base_path().'/images/vqrcode/'.$qr_code_filename;
-            \QrCode::format('png')->size(250)->generate($vehicle_to_update->rv_id, $qr_code_full_filename);
+            \QrCode::format('png')->size(250)->generate($vehicle_to_update->id, $qr_code_full_filename);
             $vehicle_to_update->vqrcode = $qr_code_full_filename;
             $vehicle_to_update->save();
 
-            return Redirect::to('/RVPDF/?rv_id='. $vehicle_inserted_id );
+            return Redirect::to('/RVPDF/?id='. $vehicle_inserted_id );
         }  else 
                {
                    exit();
@@ -274,19 +274,19 @@ class ClientController extends Controller {
             $rvehicle->yearModel = $data['yearModel']; 
             $rvehicle->save();
 
-          $vehicle_inserted_id = $rvehicle->renewvehicle_id;
+          $vehicle_inserted_id = $rvehicle->id;
             $license_to_update = RenewVehicle::find($vehicle_inserted_id);
              //qr code
-            $qr_code_filename = $license_to_update->renewvehicle_id;
+            $qr_code_filename = $license_to_update->id;
             $qr_code_filename = strtolower($qr_code_filename);
             $qr_code_filename = $qr_code_filename.'_'.uniqid().'.png';
             $qr_code_full_filename = base_path().'/images/rvqrcode/'.$qr_code_filename;
-            \QrCode::format('png')->size(250)->generate($license_to_update->renewvehicle_id, $qr_code_full_filename);
+            \QrCode::format('png')->size(250)->generate($license_to_update->id, $qr_code_full_filename);
             $license_to_update->rvqrcode = $qr_code_full_filename;
             $license_to_update->save();
 
 
-            return Redirect::to('/intorenew/?renewvehicle_id='. $vehicle_inserted_id );
+            return Redirect::to('/intorenew/?id='. $vehicle_inserted_id );
         }  else 
                {
                    exit();
@@ -326,8 +326,8 @@ class ClientController extends Controller {
         if($validation->passes()) {
             $license = new RegisterLicense;
             $client_info = Session::get('client_info');
-            $id = $client_info[0]->client_id;
-            $license->client_id = $id;
+            $rrid = $client_info[0]->client_id;
+            $license->client_id = $rrid;
             $license->transaction_type = 'License Registration';
             $license->first_name = $data['first_name'];
             $license->last_name = $data['last_name'];
@@ -355,18 +355,18 @@ class ClientController extends Controller {
             $license->mothername = $data['mothername']; 
             $license->save();
 
-            $license_inserted_id = $license->rl_id;
+            $license_inserted_id = $license->id;
             $license_to_update = RegisterLicense::find($license_inserted_id);
              //qr code
-            $qr_code_filename = $license_to_update->rl_id;
+            $qr_code_filename = $license_to_update->id;
             $qr_code_filename = strtolower($qr_code_filename);
             $qr_code_filename = $qr_code_filename.'_'.uniqid().'.png';
             $qr_code_full_filename = base_path().'/images/qrcode/'.$qr_code_filename;
-            \QrCode::format('png')->size(250)->generate($license_to_update->rl_id, $qr_code_full_filename);
+            \QrCode::format('png')->size(250)->generate($license_to_update->id, $qr_code_full_filename);
             $license_to_update->qrcode = $qr_code_full_filename;
             $license_to_update->save();
 
-            return Redirect::to('/intopdfRL/?rl_id='. $license_inserted_id );
+            return Redirect::to('/intopdfRL/?id='. $license_inserted_id );
         }
         else 
        {
@@ -407,8 +407,8 @@ class ClientController extends Controller {
         if($validation->passes()) {
             $rlicense = new RenewLicense;
             $client_info = Session::get('client_info');
-            $id = $client_info[0]->client_id;
-            $rlicense->client_id = $id;
+            $rrrid = $client_info[0]->client_id;
+            $rlicense->client_id = $rrrid;
             $rlicense->transaction_type = 'License Renewal';
             $rlicense->first_name = $data['first_name'];
             $rlicense->last_name = $data['last_name'];
@@ -436,18 +436,18 @@ class ClientController extends Controller {
             $rlicense->mothername = $data['mothername']; 
             $rlicense->save();
 
-            $rlicense_inserted_id = $rlicense->renewlicense_id;
+            $rlicense_inserted_id = $rlicense->id;
             $rlicense_to_update = RenewLicense::find($rlicense_inserted_id);
              //qr code
-            $rqr_code_filename = $rlicense_to_update->renewlicense_id;
+            $rqr_code_filename = $rlicense_to_update->id;
             $rqr_code_filename = strtolower($rqr_code_filename);
             $rqr_code_filename = $rqr_code_filename.'_'.uniqid().'.png';
             $rqr_code_full_filename = base_path().'/images/rqrcode/'.$rqr_code_filename;
-            \QrCode::format('png')->size(250)->generate($rlicense_to_update->renewlicense_id, $rqr_code_full_filename);
+            \QrCode::format('png')->size(250)->generate($rlicense_to_update->id, $rqr_code_full_filename);
             $rlicense_to_update->rqrcode = $rqr_code_full_filename;
             $rlicense_to_update->save();
 
-            return Redirect::to('/into/?renewlicense_id='. $rlicense_inserted_id );
+            return Redirect::to('/into/?id='. $rlicense_inserted_id );
         }
         else 
        {
@@ -460,7 +460,7 @@ class ClientController extends Controller {
     public function RLtoPDF(){
         
         //get data to generate from url query string
-        $id = Input::get('rl_id');
+        $id = Input::get('id');
         $data = RegisterLicense::find($id);
      
         $full_name = ucwords($data->first_name.' '.$data->last_name);
@@ -578,7 +578,7 @@ class ClientController extends Controller {
     public function RVtoPDF(){
         
         //get data to generate from url query string
-        $id = Input::get('rv_id');
+        $id = Input::get('id');
         $data = RegisterVehicle::find($id);
      
         $full_name = ucwords($data->first_name.' '.$data->last_name);
@@ -606,7 +606,7 @@ class ClientController extends Controller {
                     <body>
                     
                     <div class="form-style-6">
-                    <h1>LICENSE REGISTRATION FORM</h1>
+                    <h1>VEHICLE REGISTRATION FORM</h1>
                     <ul>
                         <li>Name: '.$full_name.' 
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -729,11 +729,11 @@ class ClientController extends Controller {
 //PDF the scanned qrcode register license
     public function qrcodeToPDF(){
         //get data to generate from url query string
-        $asdid = Input::get('rl_id');
+        $asdid = Input::get('id');
         $data = RegisterLicense::find($asdid);
 
         //get priority number
-        //this is for the 350 limit per operation day
+        //this is for the 50 limit per operation day
         $last_queue = Queue::orderBy('queue_label', 'DESC')->orderBy('created_at', 'DESC')->first();
         $last_queue_label = $last_queue->queue_label;
         if( $last_queue_label == 50 /* limit per day  */ ){
@@ -796,14 +796,14 @@ class ClientController extends Controller {
         return $pdf->stream( $file_name, array('Attachment' => false));  
     }
 
-//PDF the scanned qrcode register vehicle
+    //PDF the scanned qrcode register vehicle
     public function vqrcodeToPDF(){
         //get data to generate from url query string
-        $rv_id = Input::get('rv_id');
-        $data = RegisterVehicle::find($rv_id);
+        $asdid = Input::get('id');
+        $data = RegisterVehicle::find($asdid);
 
         //get priority number
-        //this is for the 350 limit per operation day
+        //this is for the 50 limit per operation day
         $last_queue = Queue::orderBy('queue_label', 'DESC')->orderBy('created_at', 'DESC')->first();
         $last_queue_label = $last_queue->queue_label;
         if( $last_queue_label == 50 /* limit per day  */ ){
@@ -814,7 +814,7 @@ class ClientController extends Controller {
         }
 
         $queue = new Queue;
-        $queue->transactionID_fk = $rv_id;
+        $queue->transactionID_fk = $asdid;
         $queue->processID_fk = 1;
         $queue->counterID_fk = 1;
         $queue->queue_label = $priority_number;             
@@ -847,7 +847,7 @@ class ClientController extends Controller {
                     <body>
                     
                     <div class="form-style-6">
-                    <h1>Vehicle Registration</h1>
+                    <h1>vehicle Registration</h1>
                     <ul>
                         <li>Transaction type: Vehicle Registration</li>
                         <li>Name: '. $full_name.'</li>
@@ -866,6 +866,7 @@ class ClientController extends Controller {
         return $pdf->stream( $file_name, array('Attachment' => false));  
     }
 
+   
 
 
     //insert client information

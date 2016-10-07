@@ -13,11 +13,11 @@ class Queue extends Model
     protected $fillable = ['transactionID_fk','counterID_fk', 'clientID_fk', 'queue_label'];
 
     public function getRegisterLicense(){
-        return $this->hasMany("App\RegisterLicense", "rl_id", "rl_id" );
+        return $this->hasMany("App\RegisterLicense", "id", "id" );
     }
 
     public function getRegisterVehicle(){
-        return $this->hasMany("App\RegisterVehicle", "rv_id", "rv_id" );
+        return $this->hasMany("App\RegisterVehicle", "id", "id" );
     }
 
     public function getCounter(){

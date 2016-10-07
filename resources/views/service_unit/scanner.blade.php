@@ -77,12 +77,13 @@
 
     setInterval( function(){
       $('.msg').fadeOut(1000);
-    }, 2000 );
+    }, 1000 );
 
     $('#reader').html5_qrcode(function(data){
       $('#read').html(data);
-      window.location = 'http://localhost:8000/qrcode/';
+      window.location = 'http://localhost:8000/qrcode/?id=' + data;
     },
+   
     function(error){
       $('#read_error').html(error);
     }, function(videoError){

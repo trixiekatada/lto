@@ -1565,18 +1565,15 @@ figure.effect-layla h4.effect3{
 	margin: 0 30px;
 	color: black;
 }
-.project-fur1 {
+.view_project-fur{
 	border: 1px solid black;
-	margin: 0 30px;
+	margin: 0 5px;
 	color: black;
 }
-.project-fur1 {
-  margin: 100%;
+.view_fur{
+	width: 200px;
+	height: 200px;
 }
-.project-fur1 {
-  margin: 0 50px;
-}
-
 .fur{
 	width: 500px;
 	height: 400px;
@@ -3663,9 +3660,7 @@ figure.effect-layla h4.effect2 {
 .premium {
   min-height: 330px;
 }
-.project-fur {
-  margin: 100%;
-}
+
 .fur1 h6 {
   font-size: 0.9em;
 }
@@ -4280,10 +4275,7 @@ h1.typo1 {
 }
 }
 @media(max-width:320px){
-.container {
-  padding-right: 10px;
-  padding-left: 10px;
-}
+
 .logo h1 {
   font-size: 1.5em;
 }
@@ -4907,9 +4899,7 @@ select.drop-select1 {
 .future h3 {
   margin: 0 0 0.5em;
 }
-.project-fur {
-  margin: 0 50px;
-}
+
 .fur {
   padding: 10.0em 10.0em;
 }
